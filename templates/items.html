@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Marketplace</title>
+</head>
+<body>
+
+    <h1>College Marketplace</h1>
+
+    {% for item in items %}
+
+        <h3>{{ item.title }}</h3>
+
+        <p>{{ item.description }}</p>
+
+        <p>Price: ₹{{ item.price }}</p>
+
+        <p>Category: {{ item.category }}</p>
+
+        <hr>
+
+    {% endfor %}
+
+</body>
+</html>
