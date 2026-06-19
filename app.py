@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,redirect,request
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
@@ -30,20 +30,6 @@ def home():
     """
 
 
-@app.route("/add")
-def add_item():
-
-    item = Item(
-        title="Engineering Drawing Kit",
-        description="Used for one semester",
-        price=200,
-        category="Drawing Tools"
-    )
-
-    db.session.add(item)
-    db.session.commit()
-
-    return "Item Added"
 
 @app.route("/items")
 def items():
@@ -54,6 +40,75 @@ def items():
         "items.html",
         items=all_items
     )
+
+@app.route("/item/<int:item_id>")
+def item_detail(item_id):
+
+    item = Item.query.get_or_404(item_id)
+
+    return render_template(
+        "item_detail.html",
+        item=item
+    )
+
+
+
+@app.route("/create", methods=["GET", "POST"])
+def create_item():
+
+    if request.method == "POST":
+
+        title = request.form["title"]
+        description = request.form["description"]
+        price = request.form["price"]
+        category = request.form["category"]
+
+        item = Item(
+            title=title,
+            description=description,
+            price=price,
+            category=category
+        )
+
+        db.session.add(item)
+        db.session.commit()
+
+        return redirect("/items")
+
+    return render_template("add_item.html")
+
+@app.route("/edit/<int:item_id>", methods=["GET", "POST"])
+def edit_item(item_id):
+
+    item = Item.query.get_or_404(item_id)
+
+    if request.method == "POST":
+
+        item.title = request.form["title"]
+        item.description = request.form["description"]
+        item.price = request.form["price"]
+        item.category = request.form["category"]
+
+        db.session.commit()
+
+        return redirect(f"/item/{item.id}")
+
+    return render_template(
+        "edit_item.html",
+        item=item
+    )
+
+@app.route("/delete/<int:item_id>")
+def delete_item(item_id):
+
+    item = Item.query.get_or_404(item_id)
+
+    db.session.delete(item)
+
+    db.session.commit()
+
+    return redirect("/items")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
