@@ -1,11 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ item.title }}</title>
-</head>
-<body>
+{% extends "base.html" %}
+  
+{% block title %}
+   {{ item.title }}
+{% endblock %}
+
+{% block content %}
+    <body>
 
     <h1>{{ item.title }}</h1>
+    <p>Seller: {{ item.owner.username }}</p>
+
+    <p>College: {{ item.owner.college }}</p>
 
     <p>Description: {{ item.description }}</p>
 
@@ -28,4 +33,5 @@
     </a>
 
 </body>
-</html>
+
+{% endblock %}

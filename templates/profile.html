@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{ current_user.username }}</h2>
+
+<p>Email: {{ current_user.email }}</p>
+
+<p>College: {{ current_user.college }}</p>
+
+<hr>
+
+<h3>My Listings</h3>
+
+{% if items %}
+
+    {% for item in items %}
+
+        <div class="card p-3 mb-3">
+
+            <h5>{{ item.title }}</h5>
+
+            <p>₹{{ item.price }}</p>
+
+            <a href="/edit/{{ item.id }}"
+               class="btn btn-warning">
+               Edit
+            </a>
+
+            <a href="/delete/{{ item.id }}"
+               class="btn btn-danger">
+               Delete
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>You haven't listed any items yet.</p>
+
+{% endif %}
+
+{% endblock %}

@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Item</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}
+add_item
+{% endblock %}
+
+{% block content %}
+   <body>
 
     <h1>Add Item</h1>
 
@@ -34,4 +36,5 @@
     </form>
 
 </body>
-</html>
+
+{% endblock %}

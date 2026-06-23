@@ -1,9 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
+{% extends "base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+  <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .danger {
+            background-color: #f44336;
+        }
+
+        .success {
+            background-color: #4CAF50;
+        }
+
+        .closebtn {
+            float: right;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+
+
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">
+                <span class="closebtn"
+                      onclick="this.parentElement.style.display='none';">
+                    &times;
+                </span>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 <h2>Login</h2>
 
@@ -28,8 +68,15 @@
     <button type="submit">
         Login
     </button>
+    
 
 </form>
+<div class="mt-3">
+    Already have an account?
+    <a href="/login">Login here</a>
+</div>
 
 </body>
-</html>
+
+{% endblock %}
+

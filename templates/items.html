@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>College Marketplace</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}
+College Marketplace
+{% endblock %}
+
+{% block content %}
+   <body>
 
     <h1>College Marketplace</h1>
 
@@ -26,4 +28,5 @@
     {% endfor %}
 
 </body>
-</html>
+
+{% endblock %}

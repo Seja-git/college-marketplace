@@ -1,3 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+register page
+{% endblock %}
+
+{% block content %}
+
+<style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .danger {
+            background-color: #f44336;
+        }
+
+        .success {
+            background-color: #4CAF50;
+        }
+
+        .closebtn {
+            float: right;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">
+                <span class="closebtn"
+                      onclick="this.parentElement.style.display='none';">
+                    &times;
+                </span>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <h2>Register</h2>
 
 <form method="POST">
@@ -16,6 +61,23 @@
 
     <br><br>
 
+    <select name="college" class="form-select" required>
+
+    <option value="">Select College</option>
+
+    <option>COEP</option>
+
+    <option>MIT-WPU</option>
+
+    <option>PICT</option>
+
+    <option>PCCOE</option>
+
+    <option>VIT Pune</option>
+
+    </select>
+    <br><br>
+
     <input
         type="password"
         name="password"
@@ -28,3 +90,13 @@
     </button>
 
 </form>
+
+   <div class="mt-3">
+    Already have an account?
+    <a href="/login">Login here</a>
+    </div>
+    
+</body>
+
+{% endblock %}
+
