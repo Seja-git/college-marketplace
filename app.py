@@ -33,6 +33,17 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+CATEGORIES = [
+    "Books",
+    "Electronics",
+    "Notes",
+    "Cycles",
+    "Furniture",
+    "Sports",
+    "Hostel Essentials",
+    "Others"
+]
+
 
 # -------------------
 # User Model
@@ -256,7 +267,10 @@ def create_item():
 
         return redirect("/items")
 
-    return render_template("add_item.html")
+    return render_template(
+    "add_item.html",
+    categories=CATEGORIES
+)
 
 
 # -------------------
@@ -284,9 +298,10 @@ def edit_item(item_id):
         return redirect(f"/item/{item.id}")
 
     return render_template(
-        "edit_item.html",
-        item=item
-    )
+    "edit_item.html",
+    item=item,
+    categories=CATEGORIES
+)
 
 
 
@@ -325,6 +340,8 @@ def profile():
         "profile.html",
         items=my_items
     )
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

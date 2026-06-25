@@ -26,8 +26,24 @@ add_item
 
         <br><br>
 
-        <label>Category</label>
-        <input type="text" name="category">
+        <select
+        name="category"
+        class="form-select"
+        required>
+
+        <option value="">
+        Select Category
+        </option>
+
+        {% for category in categories %}
+
+        <option value="{{ category }}">
+            {{ category }}
+        </option>
+
+       {% endfor %}
+
+        </select>
 
         <br><br>
 

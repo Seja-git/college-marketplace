@@ -33,11 +33,26 @@ edit_item
 
         <br><br>
 
-        <input
-            type="text"
-            name="category"
-            value="{{ item.category }}"
-        >
+        <select
+        name="category"
+       class="form-select"
+       required>
+
+       {% for category in categories %}
+
+        <option
+            value="{{ category }}"
+            {% if item.category == category %}
+            selected
+            {% endif %}>
+
+            {{ category }}
+
+        </option>
+
+    {% endfor %}
+
+     </select>
 
         <br><br>
 

@@ -1,0 +1,54 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+
+<h2>{{ current_user.username }}</h2>
+
+<p><strong>College:</strong> {{ current_user.college }}</p>
+<p><strong>Email:</strong> {{ current_user.email }}</p>
+
+<hr>
+
+<h3>My Listings</h3>
+
+{% if items %}
+
+    {% for item in items %}
+
+        <div class="card mb-3">
+            <div class="card-body">
+
+                <h5>{{ item.title }}</h5>
+
+                <p>₹{{ item.price }}</p>
+
+                <a href="/item/{{ item.id }}"
+                   class="btn btn-primary">
+                    View
+                </a>
+
+                <a href="/edit/{{ item.id }}"
+                   class="btn btn-warning">
+                    Edit
+                </a>
+
+                <a href="/delete/{{ item.id }}"
+                   class="btn btn-danger">
+                    Delete
+                </a>
+
+            </div>
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>You haven't listed any items yet.</p>
+
+{% endif %}
+
+{% endblock %}
