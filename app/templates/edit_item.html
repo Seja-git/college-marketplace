@@ -9,7 +9,7 @@ edit_item
 
     <h1>Edit Item</h1>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
 
         <input
             type="text"
@@ -55,6 +55,21 @@ edit_item
      </select>
 
         <br><br>
+
+       {% if item.image %}
+    <div class="mb-3">
+
+    <label class="form-label">Current Image</label>
+
+    <br>
+
+    <img
+        src="{{ url_for('static', filename='uploads/' + item.image) }}"
+        class="img-thumbnail"
+        width="250">
+
+   </div>
+   {% endif %}
 
         <button type="submit">
             Save Changes

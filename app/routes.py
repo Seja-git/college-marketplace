@@ -1,4 +1,10 @@
 # app/routes.py
+import os
+import uuid
+
+from werkzeug.utils import secure_filename
+
+from flask import current_app
 
 from flask import render_template, request, redirect, flash
 from flask_login import (
@@ -152,12 +158,29 @@ def register_routes(app):
             description = request.form["description"]
             price = request.form["price"]
             category = request.form["category"]
+            image = request.files["image"]
+
+            filename = None
+
+            if image and image.filename != "":
+
+               extension = os.path.splitext(image.filename)[1]
+
+               filename = f"{uuid.uuid4().hex}{extension}"
+
+               image.save(
+               os.path.join(
+               current_app.config["UPLOAD_FOLDER"],
+               filename
+               )
+               )
 
             item = Item(
                 title=title,
                 description=description,
                 price=price,
                 category=category,
+                image=filename,
                 user_id=current_user.id
             )
 

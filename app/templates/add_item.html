@@ -9,7 +9,19 @@ add_item
 
     <h1>Add Item</h1>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
+
+
+        <div class="mb-3">
+    <label class="form-label">Product Image</label>
+
+    <input
+        type="file"
+        name="image"
+        class="form-control"
+        accept="image/*"
+        required>
+    </div>
 
         <label>Title</label>
         <input type="text" name="title">

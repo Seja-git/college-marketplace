@@ -7,6 +7,22 @@
 {% block content %}
     <body>
 
+   
+
+    {% if item.image %}
+
+   <img
+    src="{{ url_for('static', filename='uploads/' + item.image) }}"
+    class="img-fluid rounded shadow"
+    style="max-height: 400px; width: 100%; object-fit: cover;"
+    alt="{{ item.name }}">
+
+   {% else %}
+
+   <p>No Image Available</p>
+
+   {% endif %}
+
     <h1>{{ item.title }}</h1>
     <p>Seller: {{ item.owner.username }}</p>
 

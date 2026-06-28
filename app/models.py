@@ -48,6 +48,8 @@ class Item(db.Model):
 
     category = db.Column(db.String(50))
 
+    image = db.Column(db.String(255), nullable=True)
+
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id")

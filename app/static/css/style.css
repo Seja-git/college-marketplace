@@ -1,0 +1,41 @@
+body{
+    background-color:#f8f9fa;
+}
+
+.card{
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.market-title{
+    font-weight:bold;
+}
+
+.price{
+    color:green;
+    font-weight:bold;
+}
+
+
+.card{
+
+    transition:0.3s;
+
+    border:none;
+
+    border-radius:15px;
+
+}
+
+.card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 30px rgba(0,0,0,.2);
+
+}
+
+.card img{
+
+    border-radius:15px 15px 0 0;
+
+}

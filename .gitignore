@@ -3,3 +3,7 @@ __pycache__/
 instance/
 *.pyc
 .env
+
+# Ignore uploaded images
+static/uploads/*
+!static/uploads/.gitkeep

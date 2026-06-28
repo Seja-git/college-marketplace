@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -11,6 +12,11 @@ def create_app():
 
     app.config["SECRET_KEY"] = "my_super_secret_key_123"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///market.db"
+    app.config["UPLOAD_FOLDER"] = os.path.join(
+    app.root_path,
+    "static",
+    "uploads"
+)
 
     db.init_app(app)
 
