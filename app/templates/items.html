@@ -60,7 +60,22 @@ College Marketplace
                     </a>
 
                 </div>
+                {% if item.id in wishlist_ids %}
 
+                <a href="{{ url_for('remove_wishlist', item_id=item.id) }}"
+                  class="btn btn-danger">
+                ✓ Added to Wishlist
+                   </a>
+
+                {% else %}
+
+                <a href="{{ url_for('add_to_wishlist', item_id=item.id) }}"
+                   class="btn btn-outline-danger">
+                ❤ Wishlist
+                 </a>
+
+                {% endif %}
+                
             </div>
 
         </div>

@@ -19,7 +19,7 @@ from werkzeug.security import (
 )
 
 from app import db
-from app.models import User, Item
+from app.models import User, Item,Wishlist
 from app.forms import CATEGORIES
 
 import re
@@ -127,25 +127,45 @@ def register_routes(app):
 
     @app.route("/")
     @app.route("/items")
+    @login_required
     def items():
 
-        all_items = Item.query.all()
+      items = Item.query.all()
 
-        return render_template(
-            "items.html",
-            items=all_items
-        )
+      wishlist_ids = []
+
+      if current_user.is_authenticated:
+        wishlist_ids = [
+            wish.item_id
+            for wish in Wishlist.query.filter_by(user_id=current_user.id).all()
+        ]
+
+      return render_template(
+        "items.html",
+        items=items,
+        wishlist_ids=wishlist_ids
+       )
 
 
     @app.route("/item/<int:item_id>")
     def item_detail(item_id):
 
         item = Item.query.get_or_404(item_id)
+        wishlist_ids = []
+
+        if current_user.is_authenticated:
+           wishlist_ids = [
+           wish.item_id
+        for wish in Wishlist.query.filter_by(user_id=current_user.id).all()
+    ]
 
         return render_template(
             "item_detail.html",
-            item=item
+            item=item,
+            wishlist_ids=wishlist_ids
+            
         )
+    
 
 
     @app.route("/create", methods=["GET", "POST"])
@@ -239,15 +259,73 @@ def register_routes(app):
         return redirect("/items")
 
 
+    
     @app.route("/profile")
     @login_required
     def profile():
 
-        my_items = Item.query.filter_by(
-            user_id=current_user.id
-        ).all()
+      my_items = Item.query.filter_by(
+        user_id=current_user.id
+      ).all()
 
-        return render_template(
-            "profile.html",
-            items=my_items
+      wishlist = Wishlist.query.filter_by(
+        user_id=current_user.id
+      ).all()
+
+      return render_template(
+        "profile.html",
+        items=my_items,
+        wishlist=wishlist
+      )
+    
+
+    @app.route("/wishlist/<int:item_id>")
+    @login_required
+    def add_to_wishlist(item_id):
+        item = Item.query.get_or_404(item_id)
+
+    # Prevent adding your own item
+        if item.user_id == current_user.id:
+          flash("You can't add your own listing to your wishlist.", "warning")
+          return redirect("/items")
+
+        existing = Wishlist.query.filter_by(
+           user_id=current_user.id,
+           item_id=item_id
+        ).first()
+
+        if existing:
+          flash("Already in wishlist.", "warning")
+          return redirect("/items")
+
+        wish = Wishlist(
+           user_id=current_user.id,
+           item_id=item_id
         )
+
+        db.session.add(wish)
+        db.session.commit()
+
+        flash("Added to wishlist!", "success")
+
+        return redirect("/items")
+    
+
+    @app.route("/wishlist/remove/<int:item_id>")
+    @login_required
+    def remove_wishlist(item_id):
+
+       wish = Wishlist.query.filter_by(
+        user_id=current_user.id,
+        item_id=item_id
+        ).first()
+
+       if wish:
+        db.session.delete(wish)
+        db.session.commit()
+
+        flash("Removed from wishlist.", "success")
+
+       return redirect(("/items"))
+
+    

@@ -1,53 +1,104 @@
 {% extends "base.html" %}
-  
+
 {% block title %}
-   {{ item.title }}
+{{ item.title }}
 {% endblock %}
 
 {% block content %}
-    <body>
 
-   
+<div class="container mt-5">
 
-    {% if item.image %}
+    <div class="card shadow-lg border-0">
+        <div class="row g-0">
 
-   <img
-    src="{{ url_for('static', filename='uploads/' + item.image) }}"
-    class="img-fluid rounded shadow"
-    style="max-height: 400px; width: 100%; object-fit: cover;"
-    alt="{{ item.name }}">
+            <!-- Image Section -->
+            <div class="col-md-5">
 
-   {% else %}
+                {% if item.image %}
 
-   <p>No Image Available</p>
+                <img
+                    src="{{ url_for('static', filename='uploads/' + item.image) }}"
+                    class="img-fluid rounded-start w-100"
+                    style="height:500px; object-fit:cover;"
+                    alt="{{ item.title }}">
 
-   {% endif %}
+                {% else %}
 
-    <h1>{{ item.title }}</h1>
-    <p>Seller: {{ item.owner.username }}</p>
+                <div class="d-flex justify-content-center align-items-center bg-light"
+                    style="height:500px;">
 
-    <p>College: {{ item.owner.college }}</p>
+                    <h4 class="text-muted">
+                        No Image Available
+                    </h4>
 
-    <p>Description: {{ item.description }}</p>
+                </div>
 
-    <p>Price: ₹{{ item.price }}</p>
+                {% endif %}
 
-    <p>Category: {{ item.category }}</p>
+            </div>
 
-    <a href="/items">Back to Items</a>
+            <!-- Details Section -->
+            <div class="col-md-7">
 
-     <br><br>
+                <div class="card-body p-4">
 
-    <a href="/edit/{{ item.id }}">
-    Edit Item
-    </a>
+                    <span class="badge bg-primary mb-3">
+                        {{ item.category }}
+                    </span>
 
-    <br><br>
+                    <h2 class="card-title fw-bold">
+                        {{ item.title }}
+                    </h2>
 
-    <a href="/delete/{{ item.id }}">
-    Delete Item
-    </a>
+                    <h3 class="text-success mb-4">
+                        ₹{{ item.price }}
+                    </h3>
 
-</body>
+                    <hr>
+
+                    <h5>Description</h5>
+
+                    <p class="text-muted">
+                        {{ item.description }}
+                    </p>
+
+                    <hr>
+
+                    <h5>Seller Information</h5>
+
+                    <p class="mb-1">
+                        <strong>Username:</strong>
+                        {{ item.owner.username }}
+                    </p>
+
+                    <p>
+                        <strong>College:</strong>
+                        {{ item.owner.college }}
+                    </p>
+
+                    <div class="mt-4">
+
+                        <a href="{{ url_for('items') }}"
+                           class="btn btn-secondary">
+                            ← Back to Marketplace
+                        </a>
+
+                        {% if current_user.is_authenticated and current_user.id != item.user_id %}
+                        <a href="{{ url_for('add_to_wishlist', item_id=item.id) }}"
+                           class="btn btn-outline-danger ms-2">
+                            ❤ Add to Wishlist
+                        </a>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
 
 {% endblock %}

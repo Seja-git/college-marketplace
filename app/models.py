@@ -34,6 +34,12 @@ class User(UserMixin, db.Model):
         backref="owner",
         lazy=True
     )
+    wishlist = db.relationship(
+    "Wishlist",
+    backref="user",
+    lazy=True,
+    cascade="all, delete-orphan"
+    )
 
 
 class Item(db.Model):
@@ -53,6 +59,29 @@ class Item(db.Model):
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id")
+    )
+
+    wishlists = db.relationship(
+    "Wishlist",
+    backref="item",
+    lazy=True,
+    cascade="all, delete-orphan"
+    )
+
+class Wishlist(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    item_id = db.Column(
+        db.Integer,
+        db.ForeignKey("item.id"),
+        nullable=False
     )
 
 
