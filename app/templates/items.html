@@ -5,12 +5,112 @@ College Marketplace
 {% endblock %}
 
 {% block content %}
-   <body>
 
-    <h1>College Marketplace</h1>
-      <div class="container mt-4">
+<div class="container mt-4">
 
+    <h1 class="mb-4 text-center">
+        College Marketplace
+    </h1>
+
+    <!-- Search & Filter -->
+    <form method="GET" action="{{ url_for('items') }}" class="mb-4">
+
+        <div class="row g-3">
+
+            <!-- Search -->
+            <div class="col-md-3">
+
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search products..."
+                    value="{{ request.args.get('search', '') }}">
+
+            </div>
+
+            <!-- Category -->
+            <div class="col-md-3">
+
+                <select
+                    name="category"
+                    class="form-select">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    {% for category in categories %}
+
+                    <option
+                        value="{{ category }}"
+                        {% if request.args.get('category') == category %}
+                            selected
+                        {% endif %}>
+
+                        {{ category }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Minimum Price -->
+            <div class="col-md-2">
+
+                <input
+                    type="number"
+                    name="min_price"
+                    class="form-control"
+                    placeholder="Min ₹"
+                    value="{{ request.args.get('min_price', '') }}">
+
+            </div>
+
+            <!-- Maximum Price -->
+            <div class="col-md-2">
+
+                <input
+                    type="number"
+                    name="max_price"
+                    class="form-control"
+                    placeholder="Max ₹"
+                    value="{{ request.args.get('max_price', '') }}">
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="col-md-2 d-flex gap-2">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary flex-fill">
+
+                    Search
+
+                </button>
+
+                <a
+                    href="{{ url_for('items') }}"
+                    class="btn btn-secondary flex-fill">
+
+                    Reset
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <!-- Item Cards -->
     <div class="row">
+
+        {% if items %}
 
         {% for item in items %}
 
@@ -23,7 +123,8 @@ College Marketplace
                 <img
                     src="{{ url_for('static', filename='uploads/' + item.image) }}"
                     class="card-img-top"
-                    style="height:250px; object-fit:cover;">
+                    style="height:250px; object-fit:cover;"
+                    alt="{{ item.title }}">
 
                 {% endif %}
 
@@ -33,18 +134,16 @@ College Marketplace
                         {{ item.category }}
                     </span>
 
-                    <h4 class="mt-2">
+                    <h4 class="mt-3">
                         {{ item.title }}
                     </h4>
 
-                    <h5 class="text-success">
+                    <h5 class="text-success fw-bold">
                         ₹{{ item.price }}
                     </h5>
 
-                    <p class="text-muted">
-
+                    <p class="text-muted mb-0">
                         {{ item.owner.college }}
-
                     </p>
 
                 </div>
@@ -52,41 +151,65 @@ College Marketplace
                 <div class="card-footer bg-white">
 
                     <a
-                        href="/item/{{ item.id }}"
-                        class="btn btn-dark w-100">
+                        href="{{ url_for('item_detail', item_id=item.id) }}"
+                        class="btn btn-dark w-100 mb-2">
 
                         View Details
 
                     </a>
 
+                    {% if current_user.is_authenticated and item.user_id != current_user.id %}
+
+                        {% if item.id in wishlist_ids %}
+
+                        <a
+                            href="{{ url_for('remove_wishlist', item_id=item.id) }}"
+                            class="btn btn-danger w-100">
+
+                            ✓ Added to Wishlist
+
+                        </a>
+
+                        {% else %}
+
+                        <a
+                            href="{{ url_for('add_to_wishlist', item_id=item.id) }}"
+                            class="btn btn-outline-danger w-100">
+
+                            ❤ Add to Wishlist
+
+                        </a>
+
+                        {% endif %}
+
+                    {% endif %}
+
                 </div>
-                {% if item.id in wishlist_ids %}
 
-                <a href="{{ url_for('remove_wishlist', item_id=item.id) }}"
-                  class="btn btn-danger">
-                ✓ Added to Wishlist
-                   </a>
-
-                {% else %}
-
-                <a href="{{ url_for('add_to_wishlist', item_id=item.id) }}"
-                   class="btn btn-outline-danger">
-                ❤ Wishlist
-                 </a>
-
-                {% endif %}
-                
             </div>
 
         </div>
 
         {% endfor %}
 
+        {% else %}
+
+        <div class="col-12">
+
+            <div class="alert alert-warning text-center">
+
+                <h4>No items found.</h4>
+
+                <p>Try changing your search or filters.</p>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
     </div>
 
 </div>
-
-
-</body>
 
 {% endblock %}

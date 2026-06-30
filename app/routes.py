@@ -130,7 +130,42 @@ def register_routes(app):
     @login_required
     def items():
 
-      items = Item.query.all()
+      query = Item.query
+
+      search = request.args.get("search")
+      category = request.args.get("category")
+      min_price = request.args.get("min_price")
+      max_price = request.args.get("max_price")
+
+      if search:
+        query = query.filter(
+        Item.title.ilike(f"%{search}%")
+        )
+
+      if category:
+        query = query.filter_by(
+        category=category
+        )
+
+      if min_price:
+         query = query.filter(
+        Item.price >= int(min_price)
+        )
+
+      if max_price:
+        query = query.filter(
+         Item.price <= int(max_price)
+        )
+
+      items = query.all()
+
+      categories = [
+      category[0]
+      for category in db.session.query(Item.category).distinct().all()
+       ]
+
+
+
 
       wishlist_ids = []
 
@@ -143,7 +178,8 @@ def register_routes(app):
       return render_template(
         "items.html",
         items=items,
-        wishlist_ids=wishlist_ids
+        wishlist_ids=wishlist_ids,
+        categories=categories
        )
 
 
