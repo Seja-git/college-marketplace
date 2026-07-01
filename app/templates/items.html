@@ -183,6 +183,15 @@ College Marketplace
                         {% endif %}
 
                     {% endif %}
+                    {% if current_user.is_authenticated and item.user_id != current_user.id %}
+                    <a
+                     href="{{ url_for('contact_seller', item_id=item.id) }}"
+                          class="btn btn-success">
+
+                          Contact Seller
+
+                          </a>
+                    {% endif %}
 
                 </div>
 

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">My Conversations</h2>
+
+    {% if conversations %}
+
+        {% for conversation in conversations %}
+
+        <div class="card mb-3 shadow-sm">
+
+            <div class="card-body">
+
+                <!-- Item Name -->
+                <h5 class="card-title">
+                    {{ conversation.item.title }}
+                </h5>
+
+                <!-- Show other participant -->
+                {% if current_user.id == conversation.seller_id %}
+
+                    <p>
+                        <strong>Chat with:</strong>
+                        {{ conversation.buyer.username }}
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        <strong>Chat with:</strong>
+                        {{ conversation.seller.username }}
+                    </p>
+
+                {% endif %}
+
+                <!-- Last Message -->
+                {% if conversation.messages %}
+
+                    <p class="text-muted mb-1">
+                        <strong>Last Message:</strong>
+                        {{ conversation.messages[-1].message }}
+                    </p>
+
+                    <small class="text-secondary">
+                        {{ conversation.messages[-1].timestamp.strftime("%d %b %Y %I:%M %p") }}
+                    </small>
+
+                {% else %}
+
+                    <p class="text-muted">
+                        No messages yet.
+                    </p>
+
+                {% endif %}
+
+                <br><br>
+
+                <a
+                    href="{{ url_for('conversation', conversation_id=conversation.id) }}"
+                    class="btn btn-primary">
+
+                    Open Chat
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert alert-info">
+
+            You don't have any conversations yet.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -19,7 +19,7 @@ from werkzeug.security import (
 )
 
 from app import db
-from app.models import User, Item,Wishlist
+from app.models import User, Item,Wishlist,Conversation,Message
 from app.forms import CATEGORIES
 
 import re
@@ -363,5 +363,151 @@ def register_routes(app):
         flash("Removed from wishlist.", "success")
 
        return redirect(("/items"))
+    
+    @app.route("/contact/<int:item_id>")
+    @login_required
+    def contact_seller(item_id):
+
+        item = Item.query.get_or_404(item_id)
+
+        if item.user_id == current_user.id:
+
+           flash(
+            "You cannot contact yourself.",
+            "warning"
+           )
+
+           return redirect("/items")
+
+        conversation = Conversation.query.filter_by(
+
+           buyer_id=current_user.id,
+
+           seller_id=item.user_id,
+
+           item_id=item.id
+
+        ).first()
+
+        if not conversation:
+
+            conversation = Conversation(
+
+              buyer_id=current_user.id,
+
+              seller_id=item.user_id,
+
+              item_id=item.id
+
+            )
+
+            db.session.add(conversation)
+
+            db.session.commit()
+
+        return redirect(
+            f"/conversation/{conversation.id}"
+        )
+    
+
+
+    @app.route("/conversation/<int:conversation_id>")
+    @login_required
+    def conversation(conversation_id):
+
+        conversation = Conversation.query.get_or_404(
+            conversation_id
+        )
+
+        if current_user.id not in [
+
+           conversation.buyer_id,
+
+           conversation.seller_id
+
+        ]:
+
+            flash(
+                "Unauthorized access.",
+                "danger"
+             )
+
+            return redirect("/items")
+        
+
+
+
+        messages = Message.query.filter_by(
+           conversation_id=conversation.id
+        ).order_by(
+           Message.timestamp
+        ).all()
+
+        return render_template(
+            "conversation.html",
+            conversation=conversation,
+            messages=messages
+        )
+    
+
+    @app.route(
+    "/conversation/<int:id>/send",
+    methods=["POST"]
+    )
+    @login_required
+    def send_message(id):
+
+        conversation = Conversation.query.get_or_404(id)
+
+        if current_user.id not in [
+            conversation.buyer_id,
+            conversation.seller_id
+        ]:
+
+            flash(
+               "Unauthorized",
+               "danger"
+            )
+
+            return redirect("/items")
+
+        text = request.form["message"]
+
+        msg = Message(
+
+          conversation_id=id,
+
+          sender_id=current_user.id,
+
+          message=text
+
+        )
+
+        db.session.add(msg)
+
+        db.session.commit()
+
+        return redirect(
+          f"/conversation/{id}"
+        )
+    
+
+  
+    @app.route("/messages")
+    @login_required
+    def messages():
+    
+
+        conversations = Conversation.query.filter(
+
+            (Conversation.buyer_id == current_user.id) |
+            (Conversation.seller_id == current_user.id)
+
+        ).order_by(Conversation.created_at.desc()).all()
+
+        return render_template(
+            "messages.html",
+            conversations=conversations
+        )
 
     

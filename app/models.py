@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from datetime import datetime
 
 from app import db, login_manager
 
@@ -41,6 +42,26 @@ class User(UserMixin, db.Model):
     cascade="all, delete-orphan"
     )
 
+    buyer_conversations = db.relationship(
+    "Conversation",
+    foreign_keys="Conversation.buyer_id",
+    backref="buyer",
+    lazy=True
+    )
+
+    seller_conversations = db.relationship(
+    "Conversation",
+    foreign_keys="Conversation.seller_id",
+    backref="seller",
+    lazy=True
+    )
+
+    messages = db.relationship(
+    "Message",
+    backref="sender",
+    lazy=True
+    )
+
 
 class Item(db.Model):
 
@@ -67,6 +88,52 @@ class Item(db.Model):
     lazy=True,
     cascade="all, delete-orphan"
     )
+    conversations = db.relationship(
+    "Conversation",
+    backref="item",
+    lazy=True
+    )
+
+
+
+
+class Conversation(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    buyer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    seller_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    item_id = db.Column(
+        db.Integer,
+        db.ForeignKey("item.id"),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    messages = db.relationship(
+    "Message",
+    backref="conversation",
+    lazy=True,
+    order_by="Message.timestamp",
+    cascade="all, delete-orphan"
+    )
+
+
+    
 
 class Wishlist(db.Model):
 
@@ -84,6 +151,35 @@ class Wishlist(db.Model):
         nullable=False
     )
 
+
+
+
+
+class Message(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    conversation_id = db.Column(
+        db.Integer,
+        db.ForeignKey("conversation.id"),
+        nullable=False
+    )
+
+    sender_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    timestamp = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
 @login_manager.user_loader
 def load_user(user_id):
