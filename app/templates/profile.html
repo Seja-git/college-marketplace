@@ -55,6 +55,25 @@ class="btn btn-danger btn-sm">
 Delete
 
 </a>
+{% if item.is_sold %}
+
+<span class="badge bg-danger ms-2">
+
+SOLD
+
+</span>
+
+{% else %}
+
+<a
+href="{{ url_for('select_buyer', item_id=item.id) }}"
+class="btn btn-success btn-sm ms-2">
+
+Mark Sold
+
+</a>
+
+{% endif %}
 
 </div>
 
@@ -147,5 +166,8 @@ Remove
 {% endfor %}
 
 </div>
+
+
+
 
 {% endblock %}

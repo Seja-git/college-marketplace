@@ -91,8 +91,55 @@
                         {% endif %}
 
                     </div>
+                    {% if item.is_sold %}
+
+        <button
+        class="btn btn-secondary"
+        disabled>
+
+        Item Sold
+
+        </button>
+
+           {% else %}
+           {% if current_user.is_authenticated and current_user.id != item.user_id %}
+
+            <a
+            href="{{ url_for('contact_seller', item_id=item.id) }}"
+            class="btn btn-success">
+
+             Contact Seller
+
+              </a>
+              
+              {% endif %}
+
+             {% endif %}
+
 
                 </div>
+
+                {% if item.is_sold %}
+
+                {% if current_user.is_authenticated %}
+
+                {% if current_user.id == item.buyer_id or current_user.id == item.user_id %}
+
+                 <a
+
+                     href="{{ url_for('review', item_id=item.id) }}"
+
+                    class="btn btn-warning">
+
+                     Leave Review
+
+                 </a>
+
+                {% endif %}
+
+                {% endif %}
+
+                {% endif %}
 
             </div>
 

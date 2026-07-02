@@ -33,7 +33,17 @@ class User(UserMixin, db.Model):
     items = db.relationship(
         "Item",
         backref="owner",
-        lazy=True
+        lazy=True,
+        foreign_keys="Item.user_id"
+
+    )
+
+
+    purchased_items = db.relationship(
+    "Item",
+    foreign_keys="Item.buyer_id",
+    backref="buyer",
+    lazy=True
     )
     wishlist = db.relationship(
     "Wishlist",
@@ -59,6 +69,20 @@ class User(UserMixin, db.Model):
     messages = db.relationship(
     "Message",
     backref="sender",
+    lazy=True
+    )
+
+    reviews_given = db.relationship(
+    "Review",
+    foreign_keys="Review.reviewer_id",
+    backref="reviewer",
+    lazy=True
+    )
+
+    reviews_received = db.relationship(
+    "Review",
+    foreign_keys="Review.reviewed_user_id",
+    backref="reviewed_user",
     lazy=True
     )
 
@@ -90,6 +114,35 @@ class Item(db.Model):
     )
     conversations = db.relationship(
     "Conversation",
+    backref="item",
+    lazy=True
+    )
+
+    is_sold = db.Column(
+    db.Boolean,
+    default=False
+    )
+
+    sold_at = db.Column(
+    db.DateTime,
+    nullable=True
+    )
+
+    buyer_id = db.Column(
+    db.Integer,
+    db.ForeignKey("user.id"),
+    nullable=True
+    )
+    
+
+    buyer_id = db.Column(
+    db.Integer,
+    db.ForeignKey("user.id"),
+    nullable=True
+    )
+
+    reviews = db.relationship(
+    "Review",
     backref="item",
     lazy=True
     )
@@ -177,6 +230,36 @@ class Message(db.Model):
     )
 
     timestamp = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+
+class Review(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    item_id = db.Column(
+        db.Integer,
+        db.ForeignKey("item.id")
+    )
+
+    reviewer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id")
+    )
+
+    reviewed_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id")
+    )
+
+    rating = db.Column(db.Integer)
+
+    comment = db.Column(db.Text)
+
+    created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
     )

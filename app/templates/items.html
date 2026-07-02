@@ -138,6 +138,16 @@ College Marketplace
                         {{ item.title }}
                     </h4>
 
+                    {% if item.is_sold %}
+
+<                    span class="badge bg-danger">
+
+                      SOLD
+
+                      </span>
+
+                      {% endif %}
+
                     <h5 class="text-success fw-bold">
                         ₹{{ item.price }}
                     </h5>
@@ -183,15 +193,30 @@ College Marketplace
                         {% endif %}
 
                     {% endif %}
-                    {% if current_user.is_authenticated and item.user_id != current_user.id %}
-                    <a
+                    {% if item.is_sold %}
+
+                   <button
+                    class="btn btn-secondary"
+                    disabled>
+
+                    Item Sold
+
+                    </button>
+
+                    {% else %}
+                    {% if current_user.is_authenticated and current_user.id != item.user_id %}
+
+                     <a
                      href="{{ url_for('contact_seller', item_id=item.id) }}"
-                          class="btn btn-success">
+                     class="btn btn-success">
 
-                          Contact Seller
+                     Contact Seller
 
-                          </a>
-                    {% endif %}
+                      </a>
+                      {% endif %}
+
+
+                     {% endif %}
 
                 </div>
 

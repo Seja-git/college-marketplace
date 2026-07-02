@@ -1,6 +1,7 @@
 # app/routes.py
 import os
 import uuid
+from datetime import datetime
 
 from werkzeug.utils import secure_filename
 
@@ -19,7 +20,7 @@ from werkzeug.security import (
 )
 
 from app import db
-from app.models import User, Item,Wishlist,Conversation,Message
+from app.models import User, Item,Wishlist,Conversation,Message,Review
 from app.forms import CATEGORIES
 
 import re
@@ -368,7 +369,16 @@ def register_routes(app):
     @login_required
     def contact_seller(item_id):
 
+        
+
         item = Item.query.get_or_404(item_id)
+
+        if item.is_sold:
+
+            flash(
+               "This item has already been sold.",
+               "warning"
+            )
 
         if item.user_id == current_user.id:
 
@@ -509,5 +519,167 @@ def register_routes(app):
             "messages.html",
             conversations=conversations
         )
-
     
+
+
+    @app.route("/sold/<int:item_id>")
+    @login_required
+    def mark_sold(item_id):
+
+        item = Item.query.get_or_404(item_id)
+
+        if item.user_id != current_user.id:
+
+            flash(
+               "You cannot modify this listing.",
+               "danger"
+            )
+
+            return redirect("/profile")
+
+        item.is_sold = True
+
+        item.sold_at = datetime.utcnow()
+
+        db.session.commit()
+
+        flash(
+           "Item marked as sold.",
+           "success"
+        )
+
+        return redirect("/profile")
+    
+
+
+    @app.route("/select-buyer/<int:item_id>", methods=["GET", "POST"])
+    @login_required
+    def select_buyer(item_id):
+
+        item = Item.query.get_or_404(item_id)
+
+    # Only seller can access
+        if item.user_id != current_user.id:
+
+           flash("Unauthorized", "danger")
+
+           return redirect("/profile")
+
+    # Get all conversations for this item
+        conversations = Conversation.query.filter_by(
+            item_id=item.id
+        ).all()
+
+        unique_buyers = {}
+
+        for conversation in conversations:
+           unique_buyers[conversation.buyer.id] = conversation.buyer
+
+        buyers = list(unique_buyers.values())
+
+        if request.method == "POST":
+
+          buyer_id = request.form["buyer_id"]
+
+          item.buyer_id = buyer_id
+
+          item.is_sold = True
+
+          item.sold_at = datetime.utcnow()
+
+          db.session.commit()
+
+          flash(
+            "Item marked as sold.",
+            "success"
+            )
+
+          return redirect("/profile")
+
+        return render_template(
+
+           "select_buyer.html",
+
+           item=item,
+
+           buyers=buyers
+
+        )
+    
+
+    @app.route("/review/<int:item_id>", methods=["GET", "POST"])
+    @login_required
+    def review(item_id):
+
+       item = Item.query.get_or_404(item_id)
+
+    # Item must be sold
+       if not item.is_sold:
+
+            flash("This item hasn't been sold yet.", "warning")
+            return redirect("/items")
+       
+       if current_user.id == item.buyer_id:
+
+            reviewed_user = item.owner
+
+       elif current_user.id == item.user_id:
+
+            reviewed_user = User.query.get(item.buyer_id)
+    
+       else:
+
+            flash("You cannot review this transaction.", "danger")
+            return redirect("/items")
+       
+       existing_review = Review.query.filter_by(
+
+        item_id=item.id,
+
+        reviewer_id=current_user.id
+
+        ).first()
+
+       if existing_review:
+
+           flash("You have already reviewed this transaction.", "warning")
+
+           return redirect("/item/" + str(item.id))
+       
+       if request.method == "POST":
+           rating = int(request.form["rating"])
+
+           comment = request.form["comment"]
+
+           review = Review(
+
+            item_id=item.id,
+
+            reviewer_id=current_user.id,
+
+            reviewed_user_id=reviewed_user.id,
+
+            rating=rating,
+
+            comment=comment
+
+            )
+           
+           db.session.add(review)
+
+           db.session.commit()
+
+           flash("Review submitted successfully.", "success")
+
+           return redirect("/item/" + str(item.id))
+       
+       return render_template(
+
+        "review.html",
+
+        item=item,
+
+        reviewed_user=reviewed_user
+
+        )
+  

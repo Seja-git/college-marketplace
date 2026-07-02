@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<h2>Select Buyer</h2>
+
+<h4>{{ item.title }}</h4>
+
+<form method="POST">
+
+{% for buyer in buyers %}
+
+<div class="form-check mb-2">
+
+<input
+
+class="form-check-input"
+
+type="radio"
+
+name="buyer_id"
+
+value="{{ buyer.id }}"
+
+required>
+
+<label class="form-check-label">
+
+{{ buyer.username }}
+
+({{ buyer.college }})
+
+</label>
+
+</div>
+
+{% endfor %}
+
+<button
+
+class="btn btn-success mt-3">
+
+Confirm Sale
+
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}
