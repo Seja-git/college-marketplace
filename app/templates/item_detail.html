@@ -9,22 +9,24 @@
 <div class="container mt-5">
 
     <div class="card shadow-lg border-0">
+
         <div class="row g-0">
 
-            <!-- Image Section -->
-            <div class="col-md-5">
+            <!-- Image -->
+            <div class="col-lg-5">
 
                 {% if item.image %}
 
                 <img
                     src="{{ url_for('static', filename='uploads/' + item.image) }}"
-                    class="img-fluid rounded-start w-100"
-                    style="height:500px; object-fit:cover;"
+                    class="img-fluid w-100 h-100 rounded-start"
+                    style="object-fit:cover; min-height:500px;"
                     alt="{{ item.title }}">
 
                 {% else %}
 
-                <div class="d-flex justify-content-center align-items-center bg-light"
+                <div
+                    class="d-flex justify-content-center align-items-center bg-light"
                     style="height:500px;">
 
                     <h4 class="text-muted">
@@ -37,113 +39,166 @@
 
             </div>
 
-            <!-- Details Section -->
-            <div class="col-md-7">
+            <!-- Details -->
+            <div class="col-lg-7">
 
-                <div class="card-body p-4">
+                <div class="card-body p-5">
 
-                    <span class="badge bg-primary mb-3">
+                    <!-- Category -->
+                    <span class="badge bg-primary fs-6 mb-3">
                         {{ item.category }}
                     </span>
 
-                    <h2 class="card-title fw-bold">
+                    <!-- Title -->
+                    <h2 class="fw-bold">
                         {{ item.title }}
                     </h2>
 
-                    <h3 class="text-success mb-4">
+                    <!-- Price -->
+                    <h3 class="text-success my-3">
                         ₹{{ item.price }}
                     </h3>
 
                     <hr>
 
+                    <!-- Description -->
                     <h5>Description</h5>
 
                     <p class="text-muted">
+
                         {{ item.description }}
+
                     </p>
 
-                    <hr>
+                    <!-- Seller -->
+                    <div class="border rounded p-3 bg-light mt-4">
 
-                    <h5>Seller Information</h5>
+                        <h5 class="mb-3">
 
-                    <p class="mb-1">
-                        <strong>Username:</strong>
-                        {{ item.owner.username }}
-                    </p>
+                            Seller Information
 
-                    <p>
-                        <strong>College:</strong>
-                        {{ item.owner.college }}
-                    </p>
+                        </h5>
 
-                    <div class="mt-4">
+                        <p class="mb-2">
 
-                        <a href="{{ url_for('items') }}"
-                           class="btn btn-secondary">
+                            <strong>Username:</strong>
+
+                            {{ item.owner.username }}
+
+                        </p>
+                        <p>
+
+                        <strong>Seller Rating:</strong>
+
+                        <span class="text-warning">
+
+                       ⭐ {{ avg_rating }}
+
+                          </span>
+
+                          ({{ review_count }} Reviews)
+
+                        </p>
+
+                        <p class="mb-0">
+
+                            <strong>College:</strong>
+
+                            {{ item.owner.college }}
+
+                        </p>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="mt-4 d-grid gap-2">
+
+                        <!-- Back -->
+
+                        <a
+                            href="{{ url_for('items') }}"
+                            class="btn btn-outline-secondary">
+
                             ← Back to Marketplace
+
                         </a>
+
+                        <!-- Wishlist -->
 
                         {% if current_user.is_authenticated and current_user.id != item.user_id %}
-                        <a href="{{ url_for('add_to_wishlist', item_id=item.id) }}"
-                           class="btn btn-outline-danger ms-2">
-                            ❤ Add to Wishlist
-                        </a>
+
+                            {% if item.id in wishlist_ids %}
+
+                                <a
+                                    href="{{ url_for('remove_wishlist', item_id=item.id) }}"
+                                    class="btn btn-danger">
+
+                                    ❤ Remove from Wishlist
+
+                                </a>
+
+                            {% else %}
+
+                                <a
+                                    href="{{ url_for('add_to_wishlist', item_id=item.id) }}"
+                                    class="btn btn-outline-danger">
+
+                                    ❤ Add to Wishlist
+
+                                </a>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                        <!-- Contact Seller -->
+
+                        {% if item.is_sold %}
+
+                            <button
+                                class="btn btn-secondary"
+                                disabled>
+
+                                Item Sold
+
+                            </button>
+
+                        {% elif current_user.is_authenticated and current_user.id != item.user_id %}
+
+                            <a
+                                href="{{ url_for('contact_seller', item_id=item.id) }}"
+                                class="btn btn-success">
+
+                                Contact Seller
+
+                            </a>
+
+                        {% endif %}
+
+                        <!-- Review -->
+
+                        {% if item.is_sold
+                              and current_user.is_authenticated
+                              and (current_user.id == item.user_id or current_user.id == item.buyer_id) %}
+
+                            <a
+                                href="{{ url_for('review', item_id=item.id) }}"
+                                class="btn btn-warning">
+
+                                Leave Review
+
+                            </a>
+
                         {% endif %}
 
                     </div>
-                    {% if item.is_sold %}
-
-        <button
-        class="btn btn-secondary"
-        disabled>
-
-        Item Sold
-
-        </button>
-
-           {% else %}
-           {% if current_user.is_authenticated and current_user.id != item.user_id %}
-
-            <a
-            href="{{ url_for('contact_seller', item_id=item.id) }}"
-            class="btn btn-success">
-
-             Contact Seller
-
-              </a>
-              
-              {% endif %}
-
-             {% endif %}
-
 
                 </div>
-
-                {% if item.is_sold %}
-
-                {% if current_user.is_authenticated %}
-
-                {% if current_user.id == item.buyer_id or current_user.id == item.user_id %}
-
-                 <a
-
-                     href="{{ url_for('review', item_id=item.id) }}"
-
-                    class="btn btn-warning">
-
-                     Leave Review
-
-                 </a>
-
-                {% endif %}
-
-                {% endif %}
-
-                {% endif %}
 
             </div>
 
         </div>
+
     </div>
 
 </div>

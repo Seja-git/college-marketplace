@@ -26,12 +26,16 @@ body{
 
 }
 
-.card:hover{
+.card{
+    overflow:hidden;
+}
 
-    transform:translateY(-8px);
+.card img{
+    transition:transform .3s ease;
+}
 
-    box-shadow:0 15px 30px rgba(0,0,0,.2);
-
+.card:hover img{
+    transform:scale(1.05);
 }
 
 .card img{

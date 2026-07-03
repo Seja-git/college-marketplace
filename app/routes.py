@@ -2,6 +2,7 @@
 import os
 import uuid
 from datetime import datetime
+from app.utils import get_seller_rating
 
 from werkzeug.utils import secure_filename
 
@@ -176,31 +177,45 @@ def register_routes(app):
             for wish in Wishlist.query.filter_by(user_id=current_user.id).all()
         ]
 
+    
+      for item in items:
+          item.avg_rating, item.review_count = get_seller_rating(item.user_id)
+
+
       return render_template(
         "items.html",
         items=items,
         wishlist_ids=wishlist_ids,
-        categories=categories
+        categories=categories,
+        
        )
+
 
 
     @app.route("/item/<int:item_id>")
     def item_detail(item_id):
 
         item = Item.query.get_or_404(item_id)
+
         wishlist_ids = []
 
         if current_user.is_authenticated:
-           wishlist_ids = [
-           wish.item_id
-        for wish in Wishlist.query.filter_by(user_id=current_user.id).all()
-    ]
+
+            wishlist_ids = [
+            wish.item_id
+            for wish in Wishlist.query.filter_by(
+                user_id=current_user.id
+            ).all()
+            ]
+
+        avg_rating, review_count = get_seller_rating(item.user_id)
 
         return render_template(
-            "item_detail.html",
-            item=item,
-            wishlist_ids=wishlist_ids
-            
+        "item_detail.html",
+        item=item,
+        wishlist_ids=wishlist_ids,
+        avg_rating=avg_rating,
+        review_count=review_count
         )
     
 
@@ -309,10 +324,14 @@ def register_routes(app):
         user_id=current_user.id
       ).all()
 
+      avg_rating, review_count = get_seller_rating(current_user.id)
+
       return render_template(
         "profile.html",
         items=my_items,
-        wishlist=wishlist
+        wishlist=wishlist,
+        avg_rating=avg_rating,
+        review_count=review_count
       )
     
 

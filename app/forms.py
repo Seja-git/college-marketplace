@@ -6,5 +6,6 @@ CATEGORIES = [
     "Furniture",
     "Sports",
     "Hostel Essentials",
+    "Stationary & Tools",
     "Others"
 ]

@@ -130,7 +130,24 @@ College Marketplace
 
                 <div class="card-body">
 
-                    <span class="badge bg-primary">
+                    <p class="text-warning mb-2">
+
+                
+
+                 <span class="text-warning">
+
+                  ⭐ {{ item.avg_rating }}
+
+                  </span>
+
+                <small class="text-muted">
+
+                 ({{ item.review_count }} Reviews)
+
+                   </small>
+                   <br>
+
+                   <span class="badge bg-primary">
                         {{ item.category }}
                     </span>
 
@@ -140,7 +157,7 @@ College Marketplace
 
                     {% if item.is_sold %}
 
-<                    span class="badge bg-danger">
+                    <span class="badge bg-danger">
 
                       SOLD
 
@@ -193,15 +210,21 @@ College Marketplace
                         {% endif %}
 
                     {% endif %}
-                    {% if item.is_sold %}
 
-                   <button
-                    class="btn btn-secondary"
-                    disabled>
+                    {% if item.is_sold
+                              and current_user.is_authenticated
+                              and (current_user.id == item.user_id or current_user.id == item.buyer_id) %}
 
-                    Item Sold
+                            <a
+                                href="{{ url_for('review', item_id=item.id) }}"
+                                class="btn btn-warning">
 
-                    </button>
+                                Leave Review
+
+                            </a>
+
+                        
+                    
 
                     {% else %}
                     {% if current_user.is_authenticated and current_user.id != item.user_id %}

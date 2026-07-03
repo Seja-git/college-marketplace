@@ -6,6 +6,18 @@
 {% block content %}
 
 <h2>{{ current_user.username }}</h2>
+<p>
+    <strong>Rating:</strong>
+
+    <span class="text-warning">
+
+        ⭐ {{ avg_rating }}
+
+    </span>
+
+    ({{ review_count }} Reviews)
+
+</p>
 
 <p><strong>College:</strong> {{ current_user.college }}</p>
 <p><strong>Email:</strong> {{ current_user.email }}</p>
@@ -65,13 +77,79 @@ SOLD
 
 {% else %}
 
-<a
-href="{{ url_for('select_buyer', item_id=item.id) }}"
-class="btn btn-success btn-sm ms-2">
+<button
+class="btn btn-success btn-sm"
+data-bs-toggle="modal"
+data-bs-target="#soldModal{{ item.id }}">
 
 Mark Sold
 
-</a>
+</button>
+
+
+<div class="modal fade"
+     id="soldModal{{ item.id }}"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Confirm Sale
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    Are you sure you want to mark
+                    <strong>{{ item.title }}</strong>
+                    as sold?
+                </p>
+
+                <p class="text-danger mb-0">
+                    This item will no longer be available in the marketplace.
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+                <a
+                    href="{{ url_for('select_buyer', item_id=item.id) }}"
+                    class="btn btn-success">
+
+                    Yes, Continue
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endif %}
 
