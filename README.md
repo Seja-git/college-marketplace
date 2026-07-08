@@ -92,7 +92,7 @@ git clone :  https://github.com/Seja-git/college-marketplace.git
 Navigate to the project directory
 
 ```bash
-cd CampusCart-AI
+cd college_marketplace
 ```
 
 Create a virtual environment
@@ -118,7 +118,7 @@ pip install -r requirements.txt
 Run the application
 
 ```bash
-python app.py
+python run.py
 ```
 
 ---
