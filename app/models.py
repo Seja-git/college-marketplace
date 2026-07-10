@@ -135,10 +135,9 @@ class Item(db.Model):
     )
     
 
-    buyer_id = db.Column(
-    db.Integer,
-    db.ForeignKey("user.id"),
-    nullable=True
+    created_at = db.Column(
+    db.DateTime,
+    default=datetime.utcnow
     )
 
     reviews = db.relationship(
