@@ -1,9 +1,33 @@
+
+# Virtual Environment
 venv/
+
+# Python
 __pycache__/
-instance/
 *.pyc
+
+# Flask
+instance/
+
+# Environment Variables
 .env
 
-# Ignore uploaded images
+# Uploaded Images
 static/uploads/*
 !static/uploads/.gitkeep
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# AI Datasets
+*.csv
+
+# Trained Models
+*.pkl
+
+# SQLite Databases
+*.db
+*.sqlite3
