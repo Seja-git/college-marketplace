@@ -1,14 +1,16 @@
 # app/routes.py
 import os
 import uuid
+
 from datetime import datetime
 from app.utils import get_seller_rating
 
 from werkzeug.utils import secure_filename
+from ai_features.utils.description_generator import generate_description
 
 from flask import current_app
 
-from flask import render_template, request, redirect, flash
+from flask import render_template, request, redirect, flash,jsonify
 from flask_login import (
     login_user,
     logout_user,
@@ -265,7 +267,28 @@ def register_routes(app):
             "add_item.html",
             categories=CATEGORIES
         )
+    
 
+    @app.route("/generate-description", methods=["POST"])
+    @login_required
+    def generate_ai_description():
+
+       title = request.form.get("title")
+       category = request.form.get("category")
+       price = request.form.get("price")
+       details = request.form.get("details")
+
+       description = generate_description(
+        title=title,
+        category=category,
+        condition="Good",
+        price=price,
+        details=details
+       )
+
+       return jsonify({
+        "description": description
+       })
 
     @app.route("/edit/<int:item_id>", methods=["GET", "POST"])
     @login_required

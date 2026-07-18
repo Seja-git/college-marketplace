@@ -1,68 +1,229 @@
+
 {% extends "base.html" %}
 
 {% block title %}
-add_item
+Add Item
 {% endblock %}
 
 {% block content %}
-   <body>
 
-    <h1>Add Item</h1>
+<div class="container mt-4" style="max-width:700px;">
+
+    <h2 class="mb-4">Add New Item</h2>
 
     <form method="POST" enctype="multipart/form-data">
 
+        <!-- Image -->
 
         <div class="mb-3">
-    <label class="form-label">Product Image</label>
 
-    <input
-        type="file"
-        name="image"
-        class="form-control"
-        accept="image/*"
-        required>
-    </div>
+            <label class="form-label">
+                Product Image
+            </label>
 
-        <label>Title</label>
-        <input type="text" name="title">
+            <input
+                type="file"
+                name="image"
+                class="form-control"
+                accept="image/*"
+                required>
 
-        <br><br>
+        </div>
 
-        <label>Description</label>
-        <textarea name="description"></textarea>
+        <!-- Title -->
 
-        <br><br>
+        <div class="mb-3">
 
-        <label>Price</label>
-        <input type="number" name="price">
+            <label class="form-label">
+                Title
+            </label>
 
-        <br><br>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                class="form-control"
+                required>
 
-        <select
-        name="category"
-        class="form-select"
-        required>
+        </div>
 
-        <option value="">
-        Select Category
-        </option>
+        <!-- Price -->
 
-        {% for category in categories %}
+        <div class="mb-3">
 
-        <option value="{{ category }}">
-            {{ category }}
-        </option>
+            <label class="form-label">
+                Price (₹)
+            </label>
 
-       {% endfor %}
+            <input
+                type="number"
+                id="price"
+                name="price"
+                class="form-control"
+                required>
 
-        </select>
+        </div>
 
-        <br><br>
+        <!-- Category -->
 
-        <button type="submit">Add Item</button>
+        <div class="mb-3">
+
+            <label class="form-label">
+                Category
+            </label>
+
+            <select
+                id="category"
+                name="category"
+                class="form-select"
+                required>
+
+                <option value="">
+                    Select Category
+                </option>
+
+                {% for category in categories %}
+
+                <option value="{{ category }}">
+                    {{ category }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <!-- AI INPUT -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+
+                Important Points / Keywords
+
+            </label>
+
+            <textarea
+                id="details"
+                class="form-control"
+                rows="5"
+                placeholder="Example:
+
+• Used only one semester
+
+• USB cable included
+
+• Reason for selling: Course completed
+
+• Minor scratches
+
+• Works perfectly"></textarea>
+
+            <div class="form-text">
+                Mention anything you want the AI to include in the description.
+            </div>
+
+        </div>
+
+        <!-- Generate Button -->
+
+        <div class="mb-3">
+
+            <button
+                type="button"
+                id="generate-btn"
+                class="btn btn-primary">
+
+                ✨ Generate Description
+
+            </button>
+
+        </div>
+
+        <!-- Description -->
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Description
+            </label>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="6"
+                class="form-control"
+                required></textarea>
+
+            <div class="form-text">
+                You can edit the generated description before posting.
+            </div>
+
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-success">
+
+            Add Item
+
+        </button>
 
     </form>
 
-</body>
+</div>
+<script>
+
+document.getElementById("generate-btn").addEventListener("click", async function () {
+
+    const title = document.getElementById("title").value.trim();
+    const category = document.getElementById("category").value;
+    const price = document.getElementById("price").value;
+    const details = document.getElementById("details").value.trim();
+
+    if (!title || !category || !price) {
+        alert("Please enter Title, Category and Price first.");
+        return;
+    }
+
+    const button = document.getElementById("generate-btn");
+
+    button.disabled = true;
+    button.innerHTML =
+        `<span class="spinner-border spinner-border-sm"></span> Generating...`;
+
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("category", category);
+    formData.append("price", price);
+    formData.append("details", details);
+
+    try {
+
+        const response = await fetch("/generate-description", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        document.getElementById("description").value = data.description;
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Failed to generate description.");
+
+    } finally {
+
+        button.disabled = false;
+        button.innerHTML = "✨ Generate Description";
+
+    }
+
+});
+</script>
 
 {% endblock %}
