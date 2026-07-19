@@ -203,4 +203,54 @@
 
 </div>
 
+<hr class="my-5">
+
+<h3 class="mb-4">
+    🤖 Similar Items You May Like
+</h3>
+
+<div class="row">
+
+{% for rec in recommendations %}
+
+<div class="col-md-4 mb-4">
+
+    <div class="card h-100 shadow-sm">
+
+        <div class="card-body">
+
+            <span class="badge bg-primary mb-2">
+                {{ rec.category }}
+            </span>
+
+            <h5 class="card-title">
+                {{ rec.title }}
+            </h5>
+
+            <h4 class="text-success">
+                ₹{{ rec.price }}
+            </h4>
+
+            
+
+            <br><br>
+
+            <a
+                href="{{ url_for('item_detail', item_id=rec.id) }}"
+                class="btn btn-outline-primary w-100">
+
+                View Item
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
 {% endblock %}

@@ -4,6 +4,8 @@ import uuid
 
 from datetime import datetime
 from app.utils import get_seller_rating
+from ai_features.utils.recommendation import recommend
+from ai_features.utils.semantic_search import search as semantic_search
 
 from werkzeug.utils import secure_filename
 from ai_features.utils.description_generator import generate_description
@@ -142,9 +144,15 @@ def register_routes(app):
       max_price = request.args.get("max_price")
 
       if search:
-        query = query.filter(
-        Item.title.ilike(f"%{search}%")
-        )
+
+         search_results = semantic_search(search, top_n=100)
+
+         ids = search_results["id"].tolist()
+
+         if ids:
+            query = query.filter(Item.id.in_(ids))
+         else:
+            query = query.filter(False)
 
       if category:
         query = query.filter_by(
@@ -162,6 +170,17 @@ def register_routes(app):
         )
 
       items = query.all()
+
+
+      if search and ids:
+
+        item_dict = {item.id: item for item in items}
+
+        items = [
+           item_dict[item_id]
+           for item_id in ids
+           if item_id in item_dict
+        ]
 
       categories = [
       category[0]
@@ -211,13 +230,15 @@ def register_routes(app):
             ]
 
         avg_rating, review_count = get_seller_rating(item.user_id)
+        recommendations = recommend(item.id).to_dict(orient="records")
 
         return render_template(
         "item_detail.html",
         item=item,
         wishlist_ids=wishlist_ids,
         avg_rating=avg_rating,
-        review_count=review_count
+        review_count=review_count,
+        recommendations=recommendations
         )
     
 
