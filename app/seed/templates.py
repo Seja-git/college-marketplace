@@ -116,23 +116,47 @@ OTHER_DESCRIPTIONS = [
 
 ]
 
+
 TITLE_PATTERNS = [
 
 "{name}",
-
 "{brand} {name}",
 
-"{name} - Like New",
-
-"{name} in Excellent Condition",
-
-"Second Hand {name}",
-
-"Well Maintained {name}",
+"{name} (Excellent Condition)",
+"{name} (Like New)",
 
 "Used {name}",
+"Well Maintained {name}",
+"Almost New {name}",
 
-"{brand} {name} for Sale"
+"{brand} {name}",
+"{brand} {name} - Like New",
+"{brand} {name} (Excellent Condition)",
+
+"{name} - Barely Used",
+"{name} for Sale",
+"{name} - Good Condition",
+
+"Selling {name}",
+"Selling my {name}",
+
+"Student Selling {name}",
+
+"Pre-owned {name}",
+
+"{brand} {name} for Sale",
+
+"{brand} {name} - Well Maintained",
+
+"{name} Used for One Semester",
+
+"{name} in Great Condition",
+
+"{brand} {name} - Student Sale",
+
+"{name} (Negotiable)",
+
+"{brand} {name} - Good Condition"
 
 ]
 

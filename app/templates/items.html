@@ -18,16 +18,17 @@ College Marketplace
         <div class="row g-3">
 
             <!-- Search -->
-            <div class="col-md-3">
+            <div class="d-flex align-items-center mb-2">
+    <label class="form-label me-2 mb-0">Search</label>
+    <span class="badge bg-success">🤖 AI Search</span>
+</div>
 
-                <input
-                    type="text"
-                    name="search"
-                    class="form-control"
-                    placeholder="Search products..."
-                    value="{{ request.args.get('search', '') }}">
-
-            </div>
+<input
+    type="text"
+    name="search"
+    class="form-control"
+    placeholder="Search products naturally..."
+    value="{{ request.args.get('search', '') }}">
 
             <!-- Category -->
             <div class="col-md-3">

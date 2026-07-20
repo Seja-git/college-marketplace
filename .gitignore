@@ -13,8 +13,9 @@ instance/
 .env
 
 # Uploaded Images
-static/uploads/*
-!static/uploads/.gitkeep
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
 
 # VS Code
 .vscode/

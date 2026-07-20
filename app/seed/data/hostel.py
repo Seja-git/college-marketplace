@@ -1,33 +1,40 @@
+
 HOSTEL = [
 
 {
-"name":"Extension Board",
-"price_range":(250,700)
+    "name": "Extension Board",
+    "brand": "Havells",
+    "price_range": (250, 700)
 },
 
 {
-"name":"Bucket",
-"price_range":(100,300)
+    "name": "Bucket",
+    "brand": "",
+    "price_range": (100, 300)
 },
 
 {
-"name":"Mattress",
-"price_range":(800,3000)
+    "name": "Single Mattress",
+    "brand": "Sleepwell",
+    "price_range": (800, 3000)
 },
 
 {
-"name":"Table Lamp",
-"price_range":(300,900)
+    "name": "Study Table Lamp",
+    "brand": "Wipro",
+    "price_range": (300, 900)
 },
 
 {
-"name":"Electric Kettle",
-"price_range":(500,1500)
+    "name": "Electric Kettle",
+    "brand": "Prestige",
+    "price_range": (500, 1500)
 },
 
 {
-"name":"Laundry Basket",
-"price_range":(200,600)
+    "name": "Laundry Basket",
+    "brand": "",
+    "price_range": (200, 600)
 }
 
 ]

@@ -9,6 +9,7 @@ from .data.sports import SPORTS
 from .data.cycle import CYCLES
 from .data.stationarytools import STATIONERY_TOOLS
 from .data.others import OTHERS
+from .img_generator import copy_random_image
 
 
 import random
@@ -117,6 +118,7 @@ with app.app_context():
         category = product["category"]
 
         condition = choose_condition()
+        photo= copy_random_image(category)
 
         item = Item(
 
@@ -135,7 +137,7 @@ with app.app_context():
 
             category=category,
 
-            image="default.jpg",
+            image=photo,
 
             owner=seller,
 
