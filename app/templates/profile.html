@@ -22,6 +22,73 @@
 <p><strong>College:</strong> {{ current_user.college }}</p>
 <p><strong>Email:</strong> {{ current_user.email }}</p>
 
+
+
+<hr class="my-5">
+
+<h2 class="mb-4">
+🛍 My Purchases
+</h2>
+
+<div class="row">
+
+{% for item in purchased_items %}
+
+<div class="col-md-4 mb-4">
+
+<div class="card shadow">
+
+<img
+src="{{ url_for('static', filename='uploads/' + item.image) }}"
+class="card-img-top"
+style="height:220px;object-fit:cover;">
+
+<div class="card-body">
+
+<h5>{{ item.title }}</h5>
+
+<p class="text-success fw-bold">
+₹{{ item.price }}
+</p>
+
+<p>{{ item.category }}</p>
+
+<p class="mb-1">
+<strong>Seller:</strong> {{ item.owner.username }}
+</p>
+
+{% if item.sold_at %}
+<p class="text-muted small">
+Purchased on {{ item.sold_at.strftime('%d %b %Y') }}
+</p>
+{% endif %}
+
+<a
+href="{{ url_for('item_detail', item_id=item.id) }}"
+class="btn btn-primary btn-sm">
+
+View Item
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% else %}
+
+<div class="col-12">
+
+<p>You haven't purchased any items yet.</p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
 <hr>
 
 <h3>My Listings</h3>

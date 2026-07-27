@@ -374,6 +374,7 @@ def register_routes(app):
         "profile.html",
         items=my_items,
         wishlist=wishlist,
+        purchased_items=current_user.purchased_items,
         avg_rating=avg_rating,
         review_count=review_count
       )
