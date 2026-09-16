@@ -3,30 +3,53 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
 
+
 db = SQLAlchemy()
+
 login_manager = LoginManager()
+
 
 def create_app():
 
     app = Flask(__name__)
 
+
     app.config["SECRET_KEY"] = "my_super_secret_key_123"
+
+
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///market.db"
+
+
     app.config["UPLOAD_FOLDER"] = os.path.join(
-    app.root_path,
-    "static",
-    "uploads"
-)
+        app.root_path,
+        "static",
+        "uploads"
+    )
+
 
     db.init_app(app)
 
+
     login_manager.init_app(app)
+
     login_manager.login_view = "login"
 
+
+    # Register existing marketplace routes
     from app.routes import register_routes
+
     register_routes(app)
 
+
+    # Register AI Marketplace Copilot routes
+    from app.copilot.routes import register_copilot_routes
+
+    register_copilot_routes(app)
+
+
     with app.app_context():
+
         db.create_all()
+
 
     return app
