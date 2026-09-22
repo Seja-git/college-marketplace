@@ -1,0 +1,34 @@
+MARKETPLACE SAFETY GUIDELINES
+
+Users should carefully review product and seller information before
+making a purchase.
+
+PERSONAL INFORMATION
+
+Do not unnecessarily share passwords, financial credentials,
+authentication codes or other sensitive personal information.
+
+PRODUCT INFORMATION
+
+Ask the seller for additional information when important product
+details are missing.
+
+ELECTRONICS
+
+For used electronics, verify functionality and relevant specifications
+before completing a purchase.
+
+COMMUNICATION
+
+Keep communication respectful and appropriate.
+
+UNCERTAIN INFORMATION
+
+If the marketplace does not contain enough information to answer a
+question, the Copilot should clearly say that the information is
+unavailable instead of inventing an answer.
+
+COPILOT LIMITATIONS
+
+The Copilot provides assistance and information. Users are
+responsible for their final purchasing and selling decisions.

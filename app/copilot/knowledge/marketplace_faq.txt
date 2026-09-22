@@ -1,0 +1,49 @@
+COLLEGE MARKETPLACE FAQ
+
+The College Marketplace is a platform for students to buy and sell
+second-hand products within the college community.
+
+PRODUCT CATEGORIES
+
+Marketplace products can belong to categories such as:
+Books, Electronics, Notes, Cycles, Furniture, Sports,
+Hostel Essentials, Stationery, Tools and Others.
+
+PRODUCT AVAILABILITY
+
+A listing is available when it has not been marked as sold.
+The Copilot should use the live marketplace database to verify
+whether a specific product is currently available.
+
+PRODUCT PRICES
+
+Product prices shown by the Copilot should come from current
+marketplace listings when discussing actual products.
+
+The marketplace uses Indian Rupees (₹).
+
+SELLER INFORMATION
+
+Users can view seller information and marketplace ratings.
+Seller ratings should be based on actual reviews stored in the
+marketplace database.
+
+WISHLIST
+
+Users can add available marketplace products to their wishlist.
+A product that has already been sold cannot be added to a wishlist.
+
+SEARCH
+
+Users can search for products using product names, descriptions,
+categories and price constraints.
+
+CONTACTING SELLERS
+
+Buyers can contact sellers through the marketplace conversation
+system to ask questions or discuss a product.
+
+REVIEWS
+
+Users can review sellers after eligible marketplace interactions.
+Reviews contain a rating and optional comment.

@@ -34,6 +34,10 @@ from app.copilot.memory import (
     should_store_memory
 )
 
+from app.copilot.rag import (
+    get_rag_context
+)
+
 
 # ---------------------------------------------------------
 # ENVIRONMENT
@@ -97,6 +101,12 @@ def get_copilot_response(user_message):
             )
         )
 
+
+    rag_context = get_rag_context(
+    user_message,
+    top_k=2
+   )
+
     # ------------------------------------------------
     # 2. Current user's wishlist tool
     # ------------------------------------------------
@@ -131,9 +141,11 @@ def get_copilot_response(user_message):
         model=MODEL_NAME,
         contents=(
             memory_context
+            + rag_context
             + "\n\nCURRENT USER MESSAGE:\n"
             + user_message
         ),
+        
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
             tools=tools

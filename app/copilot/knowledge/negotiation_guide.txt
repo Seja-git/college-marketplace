@@ -1,0 +1,36 @@
+NEGOTIATION GUIDE
+
+Buyers and sellers may discuss prices through the marketplace
+conversation system.
+
+NEGOTIATION PRINCIPLES
+
+Negotiation should remain respectful and reasonable.
+
+BUYERS
+
+A buyer can make a reasonable offer based on the product condition,
+asking price and prices of similar listings.
+
+SELLERS
+
+A seller can accept an offer, reject it or propose another price.
+
+PRICE INFORMATION
+
+The Copilot can provide current marketplace price information when
+available. Current listing prices should come from marketplace tools.
+
+NEGOTIATION ASSISTANCE
+
+The Copilot may suggest a negotiation message for the user.
+
+The Copilot should not automatically send a negotiation message
+without the user's explicit action.
+
+IMPORTANT
+
+A suggested negotiation price is advice, not a guaranteed market
+value.
+
+The buyer and seller make the final decision about the transaction.
