@@ -43,3 +43,413 @@ body{
     border-radius:15px 15px 0 0;
 
 }
+
+
+/* ================================
+   AI COPILOT FLOATING BUTTON
+================================ */
+
+.listing-copilot-button {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+
+    border: none;
+    border-radius: 30px;
+
+    padding: 13px 20px;
+
+    background: #6f42c1;
+    color: white;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+
+    z-index: 1000;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.listing-copilot-button:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 9px 25px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ================================
+   COPILOT SIDE PANEL
+================================ */
+
+.listing-copilot-panel {
+    position: fixed;
+
+    right: 28px;
+    bottom: 85px;
+
+    width: 390px;
+    max-width: calc(100vw - 40px);
+
+    max-height: 78vh;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.20);
+
+    border: 1px solid #e5e7eb;
+
+    overflow: hidden;
+
+    z-index: 1001;
+
+    animation: copilotSlideUp 0.25s ease;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.copilot-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px 20px;
+
+    background: #6f42c1;
+    color: white;
+}
+
+.copilot-header strong {
+    font-size: 17px;
+}
+
+.copilot-header p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+
+    opacity: 0.9;
+}
+
+#closeListingCopilot {
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 26px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    opacity: 0.85;
+}
+
+#closeListingCopilot:hover {
+    opacity: 1;
+}
+
+
+/* ================================
+   BODY
+================================ */
+
+.copilot-body {
+    padding: 20px;
+
+    max-height: calc(78vh - 75px);
+
+    overflow-y: auto;
+}
+
+.copilot-body label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+#copilotProductInfo {
+    width: 100%;
+
+    resize: vertical;
+
+    min-height: 120px;
+
+    padding: 12px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+#copilotProductInfo:focus {
+    border-color: #6f42c1;
+
+    box-shadow:
+        0 0 0 3px rgba(111, 66, 193, 0.12);
+}
+
+
+/* ================================
+   GENERATE BUTTON
+================================ */
+
+#generateListingButton {
+    width: 100%;
+
+    margin-top: 14px;
+
+    padding: 11px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #6f42c1;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+#generateListingButton:hover {
+    background: #5a32a3;
+}
+
+#generateListingButton:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+}
+
+
+/* ================================
+   LOADING
+================================ */
+
+#copilotLoading {
+    margin-top: 14px;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    background: #f3f0fa;
+
+    color: #5a32a3;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* ================================
+   ERROR
+================================ */
+
+#copilotError {
+    margin-top: 14px;
+
+    padding: 10px 12px;
+
+    border-radius: 8px;
+
+    background: #fff1f2;
+
+    color: #b42318;
+
+    font-size: 13px;
+}
+
+
+/* ================================
+   RESULT
+================================ */
+
+#copilotResult {
+    margin-top: 18px;
+}
+
+#copilotResult hr {
+    margin: 18px 0;
+
+    border: none;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+#copilotResult h4 {
+    margin-bottom: 16px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color: #1f2937;
+}
+
+
+/* Generated fields */
+
+.copilot-result-box {
+    margin-bottom: 14px;
+
+    padding: 11px 12px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    color: #374151;
+}
+
+
+/* Price */
+
+.copilot-price-box {
+    margin-top: 5px;
+
+    margin-bottom: 6px;
+
+    padding: 12px;
+
+    background: #f3f0fa;
+
+    border: 1px solid #d8c9ef;
+
+    border-radius: 10px;
+
+    color: #5a32a3;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    text-align: center;
+}
+
+#generatedPriceInfo {
+    display: block;
+
+    margin-bottom: 15px;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* ================================
+   APPLY BUTTON
+================================ */
+
+#applyListingButton {
+    width: 100%;
+
+    padding: 11px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #198754;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+#applyListingButton:hover {
+    background: #157347;
+}
+
+
+/* ================================
+   ANIMATION
+================================ */
+
+@keyframes copilotSlideUp {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(15px)
+            scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+    .listing-copilot-button {
+        right: 16px;
+        bottom: 16px;
+
+        padding: 11px 16px;
+    }
+
+    .listing-copilot-panel {
+        right: 10px;
+        bottom: 75px;
+
+        width: calc(100vw - 20px);
+
+        max-height: 82vh;
+    }
+
+}

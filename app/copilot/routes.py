@@ -2,7 +2,9 @@ from flask import request, jsonify, render_template
 from flask_login import login_required
 
 from app.copilot.agent import get_copilot_response
-
+from app.copilot.tools.listing_tools import (
+    generate_listing_assistance
+)
 
 def register_copilot_routes(app):
 
@@ -74,3 +76,39 @@ def register_copilot_routes(app):
                 "success": False,
                 "error": "Unable to process your request right now."
             }), 500
+
+
+    @app.route(
+    "/copilot/generate-listing",
+    methods=["POST"]
+  )
+    @login_required
+    def generate_listing():
+
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                "success": False,
+                "message": "No data received."
+            }), 400
+
+        product_info = data.get(
+            "product_info",
+            ""
+        ).strip()
+
+        if not product_info:
+            return jsonify({
+                "success": False,
+                "message": "Please describe your product."
+            }), 400
+        result = generate_listing_assistance(
+                product_info
+            )
+    
+        if not result.get("success"):
+                return jsonify(result), 500
+        
+        return jsonify(result)
+    

@@ -16,7 +16,8 @@ from app.copilot.tools.product_tools import (
 )
 
 from app.copilot.tools.price_tools import (
-    compare_product_prices
+    compare_product_prices,
+    get_price_guidance
 )
 
 from app.copilot.tools.seller_tools import (
@@ -36,6 +37,10 @@ from app.copilot.memory import (
 
 from app.copilot.rag import (
     get_rag_context
+)
+
+from app.copilot.tools.listing_tools import (
+    generate_listing_assistance
 )
 
 
@@ -128,9 +133,11 @@ def get_copilot_response(user_message):
         search_products,
         get_product_details,
         compare_product_prices,
+        get_price_guidance,
         get_seller_information,
         get_seller_reviews,
-        add_current_user_to_wishlist
+        add_current_user_to_wishlist,
+        generate_listing_assistance
     ]
 
     # ------------------------------------------------
