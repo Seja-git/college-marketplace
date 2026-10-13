@@ -1,110 +1,303 @@
+
 {% extends "base.html" %}
 
 {% block content %}
-
 <div class="container mt-5">
 
-    <h2>
-
-        Conversation
-
-    </h2>
-
+    <!-- Conversation Header -->
+    <h2>Conversation</h2>
     <hr>
 
-    <h4>
-
-        {{ conversation.item.title }}
-
-    </h4>
+    <h4>{{ conversation.item.title }}</h4>
 
     <p>
-
-        Seller:
-
-        {{ conversation.seller.username }}
-
+        <strong>Listed Price:</strong>
+        ₹{{ "%.2f"|format(conversation.item.price or 0) }}
     </p>
 
     <p>
+        <strong>Seller:</strong> {{ conversation.seller.username }}
+    </p>
 
-        Buyer:
-
-        {{ conversation.buyer.username }}
-
+    <p>
+        <strong>Buyer:</strong> {{ conversation.buyer.username }}
     </p>
 
     <hr>
 
-    <div class="mb-4">
+    <!-- Chat Messages -->
+    <div class="mb-4" id="chat-messages">
 
-    {% if messages %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="card mb-2">
+                    <div class="card-body">
 
-        {% for msg in messages %}
+                        <strong>{{ msg.sender.username }}</strong>
 
-        <div class="card mb-2">
+                        <br>
 
-            <div class="card-body">
+                        {{ msg.message }}
 
-                <strong>{{ msg.sender.username }}</strong>
+                        <br>
 
-                <br>
+                        <small class="text-muted">
+                            {{ msg.timestamp.strftime("%d %b %Y %I:%M %p") }}
+                        </small>
 
-                {{ msg.message }}
-
-                <br>
-
-                <small class="text-muted">
-
-                    {{ msg.timestamp }}
-
-                </small>
-
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                No messages yet.
             </div>
-
-        </div>
-
-        {% endfor %}
-
-    {% else %}
-
-        <div class="alert alert-info">
-
-            No messages yet.
-
-        </div>
-
-    {% endif %}
-
-</div>
-
-<hr>
-
-<form
-    method="POST"
-    action="{{ url_for('send_message', id=conversation.id) }}">
-
-    <div class="mb-3">
-
-        <textarea
-            name="message"
-            class="form-control"
-            rows="3"
-            placeholder="Type your message..."
-            required></textarea>
+        {% endif %}
 
     </div>
 
-    <button
-        type="submit"
-        class="btn btn-success">
+    <!-- AI Negotiation Suggestions Panel -->
+    <div
+    class="card mb-4 shadow-sm"
+    id="negotiation-panel"
+    data-suggestions-url="{{ url_for('negotiation_suggestions', conversation_id=conversation.id) }}"
+    data-draft-url="{{ url_for('negotiation_draft', conversation_id=conversation.id) }}">
+        <div class="card-body">
 
-        Send
+            <h5 class="card-title">
+                ✨ AI Negotiation Assistant
+            </h5>
 
-    </button>
+            <p class="text-muted small">
+                Get helpful suggestions based on your conversation.
+            </p>
 
-</form>
+            <!-- Suggestions appear here -->
+            <div id="negotiation-suggestions">
+                <span class="text-muted small">
+                    Loading suggestions...
+                </span>
+            </div>
+
+            <!-- Status messages -->
+            <div
+                id="negotiation-status"
+                class="small mt-3"
+                role="status"
+                aria-live="polite">
+            </div>
+
+            <!-- AI draft or price comparison appears here -->
+            <div id="negotiation-result" class="mt-3"></div>
+
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Existing Message Form -->
+    <form
+        method="POST"
+        action="{{ url_for('send_message', id=conversation.id) }}"
+        id="chat-form">
+
+        <div class="mb-3">
+            <textarea
+                name="message"
+                id="message-input"
+                class="form-control"
+                rows="3"
+                placeholder="Type your message..."
+                required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Send
+        </button>
+
+    </form>
 
 </div>
 
+<!-- AI Negotiation Assistant JavaScript -->
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const negotiationPanel = document.getElementById("negotiation-panel");
+    const suggestionsContainer = document.getElementById("negotiation-suggestions");
+    const statusContainer = document.getElementById("negotiation-status");
+    const resultContainer = document.getElementById("negotiation-result");
+    const messageInput = document.getElementById("message-input");
+
+    const suggestionsUrl = negotiationPanel.dataset.suggestionsUrl;
+    const draftUrl = negotiationPanel.dataset.draftUrl;
+
+    // Load negotiation suggestions
+    async function loadSuggestions() {
+        try {
+            const response = await fetch(suggestionsUrl, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                },
+                credentials: "same-origin"
+            });
+
+            if (!response.ok) {
+                throw new Error("Could not load suggestions.");
+            }
+
+            const data = await response.json();
+
+            suggestionsContainer.replaceChildren();
+
+            if (!data.suggestions || data.suggestions.length === 0) {
+                suggestionsContainer.textContent =
+                    "Continue chatting to receive relevant suggestions.";
+                return;
+            }
+
+            data.suggestions.forEach(function (suggestion) {
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className =
+                    "btn btn-outline-primary btn-sm me-2 mb-2";
+                button.textContent = suggestion.label;
+                button.title = suggestion.reason;
+
+                button.addEventListener("click", function () {
+                    generateDraft(suggestion.action, button);
+                });
+
+                suggestionsContainer.appendChild(button);
+            });
+
+        } catch (error) {
+            suggestionsContainer.textContent =
+                "Suggestions are temporarily unavailable.";
+        }
+    }
+
+    // Generate an AI draft when a suggestion is clicked
+    async function generateDraft(action, button) {
+        statusContainer.textContent = "Preparing your request...";
+        resultContainer.replaceChildren();
+
+        const originalLabel = button.textContent;
+
+        button.disabled = true;
+        button.textContent = "Working...";
+
+        try {
+            const response = await fetch(draftUrl, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    action: action
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "The request could not be completed."
+                );
+            }
+
+            // Display comparable listing information
+            if (data.type === "comparison") {
+                const heading = document.createElement("h6");
+                heading.textContent = "Comparable Listing Information";
+
+                const details = document.createElement("pre");
+                details.className =
+                    "small bg-light border rounded p-3";
+                details.style.whiteSpace = "pre-wrap";
+                details.textContent = JSON.stringify(
+                    data.comparison,
+                    null,
+                    2
+                );
+
+                resultContainer.appendChild(heading);
+                resultContainer.appendChild(details);
+
+                statusContainer.textContent =
+                    "Comparison retrieved. Verify the details before using them.";
+
+                return;
+            }
+
+            // Check whether a draft was generated
+            if (!data.draft) {
+                throw new Error("No draft was returned.");
+            }
+
+            const heading = document.createElement("h6");
+            heading.textContent = "AI-Generated Draft";
+
+            const draftText = document.createElement("p");
+            draftText.className = "border rounded p-3";
+            draftText.style.whiteSpace = "pre-wrap";
+            draftText.textContent = data.draft;
+
+            const explanation = document.createElement("p");
+            explanation.className = "text-muted small";
+            explanation.textContent = data.explanation || "";
+
+            // Insert the draft into the existing chat input
+            const applyButton = document.createElement("button");
+            applyButton.type = "button";
+            applyButton.className = "btn btn-primary btn-sm";
+            applyButton.textContent = "Use Draft in Message Box";
+
+            applyButton.addEventListener("click", function () {
+                messageInput.value = data.draft;
+                messageInput.focus();
+
+                const endPosition = messageInput.value.length;
+
+                messageInput.setSelectionRange(
+                    endPosition,
+                    endPosition
+                );
+
+                statusContainer.textContent =
+                    "Draft added. Review or edit it before sending.";
+            });
+
+            resultContainer.appendChild(heading);
+            resultContainer.appendChild(draftText);
+            resultContainer.appendChild(explanation);
+            resultContainer.appendChild(applyButton);
+
+            statusContainer.textContent =
+                "Draft ready. It has not been sent.";
+
+        } catch (error) {
+            statusContainer.textContent =
+                error.message ||
+                "Something went wrong. Please try again.";
+
+        } finally {
+            button.disabled = false;
+            button.textContent = originalLabel;
+        }
+    }
+
+    // Run when the conversation page loads
+    loadSuggestions();
+});
+</script>
+```
+
+
 {% endblock %}
+

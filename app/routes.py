@@ -12,7 +12,7 @@ from ai_features.utils.description_generator import generate_description
 
 from flask import current_app
 
-from flask import render_template, request, redirect, flash,jsonify
+from flask import render_template, request, redirect, flash,jsonify, abort
 from flask_login import (
     login_user,
     logout_user,
@@ -29,6 +29,7 @@ from app.models import User, Item,Wishlist,Conversation,Message,Review
 from app.forms import CATEGORIES
 
 import re
+
 
 
 def register_routes(app):
