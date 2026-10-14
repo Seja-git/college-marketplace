@@ -1,102 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}
-register page
-{% endblock %}
+{% block title %}Create account | CampusCart{% endblock %}
 
 {% block content %}
-
-<style>
-        .alert {
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            color: white;
-        }
-
-        .danger {
-            background-color: #f44336;
-        }
-
-        .success {
-            background-color: #4CAF50;
-        }
-
-        .closebtn {
-            float: right;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
-<body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert {{ category }}">
-                <span class="closebtn"
-                      onclick="this.parentElement.style.display='none';">
-                    &times;
-                </span>
-                {{ message }}
+<section class="auth-page auth-page-register">
+    <div class="auth-side-panel">
+        <div class="auth-brand-mini">
+            <span class="auth-brand-mark" aria-hidden="true">▣</span>
+            <span>CampusCart <span class="campus-ai-tag">AI</span></span>
+        </div>
+        <div class="auth-promo-content">
+            <span class="auth-eyebrow">JOIN YOUR CAMPUS COMMUNITY</span>
+            <h1>Good finds deserve a second life.</h1>
+            <p>Create your account to discover affordable essentials and connect with students at your college.</p>
+            <div class="auth-benefit-list">
+                <div><span class="auth-benefit-icon">✓</span><span>List items in a few simple steps</span></div>
+                <div><span class="auth-benefit-icon">✓</span><span>Discover useful pre-loved finds</span></div>
+                <div><span class="auth-benefit-icon">✓</span><span>Connect with your campus community</span></div>
             </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<h2>Register</h2>
-
-<form method="POST">
-
-    <input
-        type="text"
-        name="username"
-        placeholder="Username">
-
-    <br><br>
-
-    <input
-        type="email"
-        name="email"
-        placeholder="Email">
-
-    <br><br>
-
-    <select name="college" class="form-select" required>
-
-    <option value="">Select College</option>
-
-    <option>COEP</option>
-
-    <option>MIT-WPU</option>
-
-    <option>PICT</option>
-
-    <option>PCCOE</option>
-
-    <option>VIT Pune</option>
-
-    </select>
-    <br><br>
-
-    <input
-        type="password"
-        name="password"
-        placeholder="Password">
-
-    <br><br>
-
-    <button type="submit">
-        Register
-    </button>
-
-</form>
-
-   <div class="mt-3">
-    Already have an account?
-    <a href="/login">Login here</a>
+        </div>
+        <div class="auth-panel-footer">Your campus marketplace starts here.</div>
     </div>
-    
-</body>
 
+    <div class="auth-form-side">
+        <div class="auth-form-card auth-form-card-register">
+            <div class="auth-mobile-brand">CampusCart <span class="campus-ai-tag">AI</span></div>
+            <span class="auth-step-label">GET STARTED</span>
+            <h2>Create your account</h2>
+            <p class="auth-subtitle">A few details and you're ready to explore.</p>
+
+            <form method="POST" class="auth-form">
+                <div class="mb-3">
+                    <label for="register-username" class="form-label">Username</label>
+                    <input id="register-username" type="text" name="username" class="form-control auth-control"
+                           placeholder="Choose a username" autocomplete="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-email" class="form-label">Email address</label>
+                    <input id="register-email" type="email" name="email" class="form-control auth-control"
+                           placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-college" class="form-label">College</label>
+                    <select id="register-college" name="college" class="form-select auth-control" required>
+                        <option value="">Select your college</option>
+                        <option>COEP</option>
+                        <option>MIT-WPU</option>
+                        <option>PICT</option>
+                        <option>PCCOE</option>
+                        <option>VIT Pune</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label for="register-password" class="form-label">Password</label>
+                    <input id="register-password" type="password" name="password" class="form-control auth-control"
+                           placeholder="Create a password" autocomplete="new-password" required>
+                </div>
+                <button type="submit" class="btn auth-submit-btn w-100">Create account <span aria-hidden="true">→</span></button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+            <a class="auth-back-link" href="{{ url_for('items') }}">← Browse the marketplace</a>
+        </div>
+    </div>
+</section>
 {% endblock %}
-
