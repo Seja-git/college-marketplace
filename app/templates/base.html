@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +11,27 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% if request.path == '/create' %}
+    <style>
+        .copilot-mode-tabs{display:flex;gap:8px;padding:12px 16px 0;border-bottom:1px solid #e6eee9}
+        .copilot-mode-tab{flex:1;border:0;border-radius:10px 10px 0 0;padding:9px 10px;background:transparent;color:#52665c;font-weight:700}
+        .copilot-mode-tab.is-active{background:#dff3e7;color:#004f38}
+        .copilot-listing-mode{padding:16px;overflow-y:auto;max-height:430px}
+        .copilot-listing-intro{font-size:.9rem;color:#617168;margin:0 0 12px}
+        .copilot-listing-label,.copilot-listing-result-field>span{display:block;font-size:.82rem;font-weight:700;color:#244b3b;margin-bottom:6px}
+        #copilot-listing-input{width:100%;resize:vertical;border:1px solid #d7e4dc;border-radius:12px;padding:11px 12px;font:inherit;outline-color:#006747}
+        .copilot-listing-generate,.copilot-listing-apply{width:100%;border:0;border-radius:11px;background:#006747;color:white;padding:11px 14px;font-weight:700;margin-top:10px}
+        .copilot-listing-generate:disabled{opacity:.65}
+        .copilot-listing-status,.copilot-listing-error{font-size:.88rem;margin-top:10px;padding:10px;border-radius:9px}
+        .copilot-listing-status{background:#f0f6f2;color:#315d49}.copilot-listing-error{background:#fff0ef;color:#9b2922}
+        .copilot-listing-result{margin-top:16px;border-top:1px solid #e2ebe5;padding-top:14px}
+        .copilot-listing-result h6{font-weight:800;color:#003f30;margin-bottom:12px}
+        .copilot-listing-result-field{margin-bottom:12px;font-size:.9rem;overflow-wrap:anywhere}
+        .copilot-listing-result-field>div{white-space:pre-wrap;background:#f5f8f6;border:1px solid #e4ece7;border-radius:9px;padding:9px 10px}
+        .copilot-listing-result-field small{display:block;color:#65776d;margin-top:5px}
+        #copilot-messages[hidden],#copilot-form[hidden],#copilot-status[hidden],#copilot-listing-mode[hidden],#copilot-listing-result[hidden],#copilot-generated-price-section[hidden],#copilot-listing-status[hidden],#copilot-listing-error[hidden]{display:none!important}
+    </style>
+    {% endif %}
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -112,6 +134,30 @@
             </div>
         </div>
 
+        {% if request.path == '/create' %}
+        <div class="copilot-mode-tabs" role="tablist" aria-label="Copilot mode">
+            <button type="button" id="copilot-chat-tab" class="copilot-mode-tab" role="tab" aria-selected="false">Chat</button>
+            <button type="button" id="copilot-listing-tab" class="copilot-mode-tab is-active" role="tab" aria-selected="true">Create listing</button>
+        </div>
+
+        <section id="copilot-listing-mode" class="copilot-listing-mode" aria-label="AI listing generator">
+            <p class="copilot-listing-intro">Describe your item once. I’ll draft the listing and suggest a price when comparable listings are available.</p>
+            <label for="copilot-listing-input" class="copilot-listing-label">What are you selling?</label>
+            <textarea id="copilot-listing-input" rows="4" maxlength="2000" placeholder="Example: Logitech G102 mouse, used for 8 months, works properly, minor scratches, USB cable included..."></textarea>
+            <button type="button" id="copilot-generate-listing" class="copilot-listing-generate">Generate listing</button>
+            <div id="copilot-listing-status" class="copilot-listing-status" role="status" hidden></div>
+            <div id="copilot-listing-error" class="copilot-listing-error" role="alert" hidden></div>
+            <div id="copilot-listing-result" class="copilot-listing-result" hidden>
+                <h6>Suggested listing</h6>
+                <div class="copilot-listing-result-field"><span>Title</span><div id="copilot-generated-title"></div></div>
+                <div class="copilot-listing-result-field"><span>Description</span><div id="copilot-generated-description"></div></div>
+                <div class="copilot-listing-result-field"><span>Category</span><div id="copilot-generated-category"></div></div>
+                <div id="copilot-generated-price-section" class="copilot-listing-result-field" hidden><span>Suggested price range</span><div id="copilot-generated-price"></div><small id="copilot-generated-price-info"></small></div>
+                <button type="button" id="copilot-apply-listing" class="copilot-listing-apply">Apply to form</button>
+            </div>
+        </section>
+        {% endif %}
+
         <div id="copilot-messages" class="copilot-messages" aria-live="polite" aria-relevant="additions">
             <div class="copilot-message assistant-message">
                 <div class="message-avatar" aria-hidden="true">✧</div>
@@ -157,7 +203,8 @@
             panel.setAttribute("aria-hidden", "false");
             toggleButton.setAttribute("aria-expanded", "true");
             toggleButton.classList.add("is-open");
-            input.focus();
+            if (listingMode && copilotMode === "listing" && listingInput) listingInput.focus();
+            else input.focus();
         }
         function closeCopilot() {
             panel.hidden = true;
@@ -184,6 +231,130 @@
             messages.scrollTop = messages.scrollHeight;
             return row;
         }
+
+        // On the Add Item page, the same global Copilot can switch between chat and listing generation.
+        const chatTab = document.getElementById("copilot-chat-tab");
+        const listingTab = document.getElementById("copilot-listing-tab");
+        const listingMode = document.getElementById("copilot-listing-mode");
+        const listingInput = document.getElementById("copilot-listing-input");
+        const listingGenerateButton = document.getElementById("copilot-generate-listing");
+        const listingStatus = document.getElementById("copilot-listing-status");
+        const listingError = document.getElementById("copilot-listing-error");
+        const listingResult = document.getElementById("copilot-listing-result");
+        const listingApplyButton = document.getElementById("copilot-apply-listing");
+        const listingTitle = document.getElementById("copilot-generated-title");
+        const listingDescription = document.getElementById("copilot-generated-description");
+        const listingCategory = document.getElementById("copilot-generated-category");
+        const listingPriceSection = document.getElementById("copilot-generated-price-section");
+        const listingPrice = document.getElementById("copilot-generated-price");
+        const listingPriceInfo = document.getElementById("copilot-generated-price-info");
+        let generatedListing = null;
+        let copilotMode = listingMode ? "listing" : "chat";
+
+        function setCopilotMode(mode) {
+            copilotMode = mode;
+            const showListing = mode === "listing" && Boolean(listingMode);
+            if (listingMode) listingMode.hidden = !showListing;
+            messages.hidden = showListing;
+            form.hidden = showListing;
+            status.hidden = showListing;
+            if (chatTab) {
+                chatTab.classList.toggle("is-active", !showListing);
+                chatTab.setAttribute("aria-selected", String(!showListing));
+            }
+            if (listingTab) {
+                listingTab.classList.toggle("is-active", showListing);
+                listingTab.setAttribute("aria-selected", String(showListing));
+            }
+            if (showListing && listingInput) listingInput.focus();
+            else input.focus();
+        }
+
+        if (chatTab) chatTab.addEventListener("click", () => setCopilotMode("chat"));
+        if (listingTab) listingTab.addEventListener("click", () => setCopilotMode("listing"));
+
+        if (listingGenerateButton) {
+            listingGenerateButton.addEventListener("click", async () => {
+                const productInfo = listingInput.value.trim();
+                if (!productInfo) {
+                    listingError.textContent = "Please describe the product first.";
+                    listingError.hidden = false;
+                    return;
+                }
+                listingError.hidden = true;
+                listingResult.hidden = true;
+                listingPriceSection.hidden = true;
+                listingStatus.textContent = "Generating listing and checking comparable prices...";
+                listingStatus.hidden = false;
+                listingGenerateButton.disabled = true;
+                listingGenerateButton.textContent = "Generating...";
+                try {
+                    const response = await fetch("/copilot/generate-listing", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {"Content-Type": "application/json", "Accept": "application/json"},
+                        body: JSON.stringify({product_info: productInfo})
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || data.error || "Unable to generate listing.");
+                    }
+                    generatedListing = data;
+                    listingTitle.textContent = data.title || "";
+                    listingDescription.textContent = data.description || "";
+                    listingCategory.textContent = data.category || "";
+                    const priceData = data.price_guidance;
+                    if (priceData && priceData.found && priceData.suggested_range) {
+                        listingPrice.textContent = `₹${priceData.suggested_range.lower} – ₹${priceData.suggested_range.upper}`;
+                        const parts = [];
+                        if (priceData.number_of_listings != null) parts.push(`Based on ${priceData.number_of_listings} similar available listings`);
+                        if (priceData.minimum_price != null && priceData.maximum_price != null) parts.push(`current range ₹${priceData.minimum_price}–₹${priceData.maximum_price}`);
+                        if (priceData.median_price != null) parts.push(`median ₹${priceData.median_price}`);
+                        listingPriceInfo.textContent = parts.join(". ") + (parts.length ? "." : "");
+                        listingPriceSection.hidden = false;
+                    }
+                    listingResult.hidden = false;
+                    listingStatus.hidden = true;
+                } catch (error) {
+                    listingStatus.hidden = true;
+                    listingError.textContent = error.message || "Unable to generate listing. Please try again.";
+                    listingError.hidden = false;
+                } finally {
+                    listingGenerateButton.disabled = false;
+                    listingGenerateButton.textContent = "Generate listing";
+                }
+            });
+        }
+
+        if (listingApplyButton) {
+            listingApplyButton.addEventListener("click", () => {
+                if (!generatedListing) return;
+                const titleField = document.getElementById("title");
+                const descriptionField = document.getElementById("description");
+                const categoryField = document.getElementById("category");
+                const priceField = document.getElementById("price");
+                if (!titleField || !descriptionField || !categoryField || !priceField) return;
+                titleField.value = generatedListing.title || "";
+                descriptionField.value = generatedListing.description || "";
+                const generatedCategoryValue = (generatedListing.category || "").trim();
+                const option = Array.from(categoryField.options).find(item => item.value === generatedCategoryValue)
+                    || Array.from(categoryField.options).find(item => item.text.trim().toLowerCase() === generatedCategoryValue.toLowerCase());
+                if (option) categoryField.value = option.value;
+                const priceData = generatedListing.price_guidance;
+                if (priceData && priceData.found && priceData.median_price != null) priceField.value = priceData.median_price;
+                titleField.dispatchEvent(new Event("input", {bubbles: true}));
+                descriptionField.dispatchEvent(new Event("input", {bubbles: true}));
+                categoryField.dispatchEvent(new Event("change", {bubbles: true}));
+                priceField.dispatchEvent(new Event("input", {bubbles: true}));
+                setCopilotMode("chat");
+                closeCopilot();
+                titleField.scrollIntoView({behavior: "smooth", block: "center"});
+                titleField.focus({preventScroll: true});
+            });
+        }
+
+        // Listing creation is the default mode when Copilot is opened on /create.
+        if (listingMode) setCopilotMode("listing");
 
         toggleButton.addEventListener("click", () => panel.hidden ? openCopilot() : closeCopilot());
         closeButton.addEventListener("click", closeCopilot);

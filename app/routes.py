@@ -1,3 +1,5 @@
+
+
 # app/routes.py
 import os
 import uuid
@@ -16,7 +18,7 @@ from ai_features.utils.description_generator import generate_description
 
 from flask import current_app
 
-from flask import render_template, request, redirect, flash,jsonify, abort
+from flask import render_template, request, redirect, flash, jsonify, abort
 from flask_login import (
     login_user,
     logout_user,
@@ -29,10 +31,11 @@ from werkzeug.security import (
 )
 
 from app import db
-from app.models import User, Item,Wishlist,Conversation,Message,Review
+from app.models import User, Item, Wishlist, Conversation, Message, Review
 from app.forms import CATEGORIES
 
 import re
+
 
 def generate_reset_token(user):
     serializer = URLSafeTimedSerializer(
@@ -96,6 +99,7 @@ CampusCart Team
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.send_message(message)
+
 
 def register_routes(app):
 
@@ -186,7 +190,6 @@ def register_routes(app):
         return render_template("login.html")
 
 
-    
     @app.route("/forgot-password", methods=["GET", "POST"])
     def forgot_password():
         if request.method == "POST":
@@ -255,7 +258,6 @@ def register_routes(app):
 
         return render_template("reset_password.html")
 
-    
 
     @app.route("/logout")
     @login_required
@@ -271,86 +273,82 @@ def register_routes(app):
     @app.route("/")
     def home():
         return render_template("index.html")
-    
+
+
     @app.route("/items")
-    
     def items():
 
-      query = Item.query
+        query = Item.query
 
-      search = request.args.get("search")
-      category = request.args.get("category")
-      min_price = request.args.get("min_price")
-      max_price = request.args.get("max_price")
+        search = request.args.get("search")
+        category = request.args.get("category")
+        min_price = request.args.get("min_price")
+        max_price = request.args.get("max_price")
 
-      if search:
+        if search:
 
-         search_results = semantic_search(search, top_n=100)
+            search_results = semantic_search(search, top_n=100)
 
-         ids = search_results["id"].tolist()
+            ids = search_results["id"].tolist()
 
-         if ids:
-            query = query.filter(Item.id.in_(ids))
-         else:
-            query = query.filter(False)
+            if ids:
+                query = query.filter(Item.id.in_(ids))
+            else:
+                query = query.filter(False)
 
-      if category:
-        query = query.filter_by(
-        category=category
-        )
+        if category:
+            query = query.filter_by(
+                category=category
+            )
 
-      if min_price:
-         query = query.filter(
-        Item.price >= int(min_price)
-        )
+        if min_price:
+            query = query.filter(
+                Item.price >= int(min_price)
+            )
 
-      if max_price:
-        query = query.filter(
-         Item.price <= int(max_price)
-        )
+        if max_price:
+            query = query.filter(
+                Item.price <= int(max_price)
+            )
 
-      items = query.all()
+        items = query.all()
 
+        if search and ids:
 
-      if search and ids:
+            item_dict = {item.id: item for item in items}
 
-        item_dict = {item.id: item for item in items}
+            items = [
+                item_dict[item_id]
+                for item_id in ids
+                if item_id in item_dict
+            ]
 
-        items = [
-           item_dict[item_id]
-           for item_id in ids
-           if item_id in item_dict
+        categories = [
+            category[0]
+            for category in db.session.query(Item.category).distinct().all()
         ]
 
-      categories = [
-      category[0]
-      for category in db.session.query(Item.category).distinct().all()
-       ]
+        wishlist_ids = []
 
+        if current_user.is_authenticated:
+            wishlist_ids = [
+                wish.item_id
+                for wish in Wishlist.query.filter_by(
+                    user_id=current_user.id
+                ).all()
+            ]
 
+        for item in items:
+            item.avg_rating, item.review_count = get_seller_rating(
+                item.user_id
+            )
 
-
-      wishlist_ids = []
-
-      if current_user.is_authenticated:
-        wishlist_ids = [
-            wish.item_id
-            for wish in Wishlist.query.filter_by(user_id=current_user.id).all()
-        ]
-
-    
-      for item in items:
-          item.avg_rating, item.review_count = get_seller_rating(item.user_id)
-
-
-      return render_template(
-        "items.html",
-        items=items,
-        wishlist_ids=wishlist_ids,
-        categories=categories,
-        
-       )
-
+        return render_template(
+            "items.html",
+            items=items,
+            wishlist_ids=wishlist_ids,
+            categories=categories,
+        )
 
 
     @app.route("/item/<int:item_id>")
@@ -363,24 +361,23 @@ def register_routes(app):
         if current_user.is_authenticated:
 
             wishlist_ids = [
-            wish.item_id
-            for wish in Wishlist.query.filter_by(
-                user_id=current_user.id
-            ).all()
+                wish.item_id
+                for wish in Wishlist.query.filter_by(
+                    user_id=current_user.id
+                ).all()
             ]
 
         avg_rating, review_count = get_seller_rating(item.user_id)
         recommendations = recommend(item.id).to_dict(orient="records")
 
         return render_template(
-        "item_detail.html",
-        item=item,
-        wishlist_ids=wishlist_ids,
-        avg_rating=avg_rating,
-        review_count=review_count,
-        recommendations=recommendations
+            "item_detail.html",
+            item=item,
+            wishlist_ids=wishlist_ids,
+            avg_rating=avg_rating,
+            review_count=review_count,
+            recommendations=recommendations
         )
-    
 
 
     @app.route("/create", methods=["GET", "POST"])
@@ -399,16 +396,16 @@ def register_routes(app):
 
             if image and image.filename != "":
 
-               extension = os.path.splitext(image.filename)[1]
+                extension = os.path.splitext(image.filename)[1]
 
-               filename = f"{uuid.uuid4().hex}{extension}"
+                filename = f"{uuid.uuid4().hex}{extension}"
 
-               image.save(
-               os.path.join(
-               current_app.config["UPLOAD_FOLDER"],
-               filename
-               )
-               )
+                image.save(
+                    os.path.join(
+                        current_app.config["UPLOAD_FOLDER"],
+                        filename
+                    )
+                )
 
             item = Item(
                 title=title,
@@ -428,28 +425,29 @@ def register_routes(app):
             "add_item.html",
             categories=CATEGORIES
         )
-    
+
 
     @app.route("/generate-description", methods=["POST"])
     @login_required
     def generate_ai_description():
 
-       title = request.form.get("title")
-       category = request.form.get("category")
-       price = request.form.get("price")
-       details = request.form.get("details")
+        title = request.form.get("title")
+        category = request.form.get("category")
+        price = request.form.get("price")
+        details = request.form.get("details")
 
-       description = generate_description(
-        title=title,
-        category=category,
-        condition="Good",
-        price=price,
-        details=details
-       )
+        description = generate_description(
+            title=title,
+            category=category,
+            condition="Good",
+            price=price,
+            details=details
+        )
 
-       return jsonify({
-        "description": description
-       })
+        return jsonify({
+            "description": description
+        })
+
 
     @app.route("/edit/<int:item_id>", methods=["GET", "POST"])
     @login_required
@@ -495,53 +493,70 @@ def register_routes(app):
         return redirect("/items")
 
 
-    
     @app.route("/profile")
     @login_required
     def profile():
 
-      my_items = Item.query.filter_by(
-        user_id=current_user.id
-      ).all()
+        my_items = Item.query.filter_by(
+            user_id=current_user.id
+        ).all()
 
-      wishlist = Wishlist.query.filter_by(
-        user_id=current_user.id
-      ).all()
+        wishlist = Wishlist.query.filter_by(
+            user_id=current_user.id
+        ).all()
 
-      avg_rating, review_count = get_seller_rating(current_user.id)
+        avg_rating, review_count = get_seller_rating(current_user.id)
 
-      return render_template(
-        "profile.html",
-        items=my_items,
-        wishlist=wishlist,
-        purchased_items=current_user.purchased_items,
-        avg_rating=avg_rating,
-        review_count=review_count
-      )
-    
+        purchased_items = current_user.purchased_items
+
+        # Find sold purchases for which the buyer hasn't reviewed the seller.
+        pending_reviews = []
+
+        for item in purchased_items:
+            if not item.is_sold:
+                continue
+
+            existing_review = Review.query.filter_by(
+                item_id=item.id,
+                reviewer_id=current_user.id
+            ).first()
+
+            if not existing_review:
+                pending_reviews.append(item)
+
+        return render_template(
+            "profile.html",
+            items=my_items,
+            wishlist=wishlist,
+            purchased_items=purchased_items,
+            pending_reviews=pending_reviews,
+            avg_rating=avg_rating,
+            review_count=review_count
+        )
+
 
     @app.route("/wishlist/<int:item_id>")
     @login_required
     def add_to_wishlist(item_id):
         item = Item.query.get_or_404(item_id)
 
-    # Prevent adding your own item
+        # Prevent adding your own item
         if item.user_id == current_user.id:
-          flash("You can't add your own listing to your wishlist.", "warning")
-          return redirect("/items")
+            flash("You can't add your own listing to your wishlist.", "warning")
+            return redirect("/items")
 
         existing = Wishlist.query.filter_by(
-           user_id=current_user.id,
-           item_id=item_id
+            user_id=current_user.id,
+            item_id=item_id
         ).first()
 
         if existing:
-          flash("Already in wishlist.", "warning")
-          return redirect("/items")
+            flash("Already in wishlist.", "warning")
+            return redirect("/items")
 
         wish = Wishlist(
-           user_id=current_user.id,
-           item_id=item_id
+            user_id=current_user.id,
+            item_id=item_id
         )
 
         db.session.add(wish)
@@ -550,79 +565,68 @@ def register_routes(app):
         flash("Added to wishlist!", "success")
 
         return redirect("/items")
-    
+
 
     @app.route("/wishlist/remove/<int:item_id>")
     @login_required
     def remove_wishlist(item_id):
 
-       wish = Wishlist.query.filter_by(
-        user_id=current_user.id,
-        item_id=item_id
+        wish = Wishlist.query.filter_by(
+            user_id=current_user.id,
+            item_id=item_id
         ).first()
 
-       if wish:
-        db.session.delete(wish)
-        db.session.commit()
+        if wish:
+            db.session.delete(wish)
+            db.session.commit()
 
-        flash("Removed from wishlist.", "success")
+            flash("Removed from wishlist.", "success")
 
-       return redirect(("/items"))
-    
+        return redirect("/items")
+
+
     @app.route("/contact/<int:item_id>")
     @login_required
     def contact_seller(item_id):
 
-        
-
         item = Item.query.get_or_404(item_id)
 
         if item.is_sold:
-
             flash(
-               "This item has already been sold.",
-               "warning"
+                "This item has already been sold.",
+                "warning"
             )
+            return redirect("/items")
 
         if item.user_id == current_user.id:
 
-           flash(
-            "You cannot contact yourself.",
-            "warning"
-           )
+            flash(
+                "You cannot contact yourself.",
+                "warning"
+            )
 
-           return redirect("/items")
+            return redirect("/items")
 
         conversation = Conversation.query.filter_by(
-
-           buyer_id=current_user.id,
-
-           seller_id=item.user_id,
-
-           item_id=item.id
-
+            buyer_id=current_user.id,
+            seller_id=item.user_id,
+            item_id=item.id
         ).first()
 
         if not conversation:
 
             conversation = Conversation(
-
-              buyer_id=current_user.id,
-
-              seller_id=item.user_id,
-
-              item_id=item.id
-
+                buyer_id=current_user.id,
+                seller_id=item.user_id,
+                item_id=item.id
             )
 
             db.session.add(conversation)
-
             db.session.commit()
 
         return redirect(
             f"/conversation/{conversation.id}"
         )
-    
 
 
     @app.route("/conversation/<int:conversation_id>")
@@ -634,27 +638,21 @@ def register_routes(app):
         )
 
         if current_user.id not in [
-
-           conversation.buyer_id,
-
-           conversation.seller_id
-
+            conversation.buyer_id,
+            conversation.seller_id
         ]:
 
             flash(
                 "Unauthorized access.",
                 "danger"
-             )
+            )
 
             return redirect("/items")
-        
-
-
 
         messages = Message.query.filter_by(
-           conversation_id=conversation.id
+            conversation_id=conversation.id
         ).order_by(
-           Message.timestamp
+            Message.timestamp
         ).all()
 
         return render_template(
@@ -662,11 +660,11 @@ def register_routes(app):
             conversation=conversation,
             messages=messages
         )
-    
+
 
     @app.route(
-    "/conversation/<int:id>/send",
-    methods=["POST"]
+        "/conversation/<int:id>/send",
+        methods=["POST"]
     )
     @login_required
     def send_message(id):
@@ -679,8 +677,8 @@ def register_routes(app):
         ]:
 
             flash(
-               "Unauthorized",
-               "danger"
+                "Unauthorized",
+                "danger"
             )
 
             return redirect("/items")
@@ -688,42 +686,32 @@ def register_routes(app):
         text = request.form["message"]
 
         msg = Message(
-
-          conversation_id=id,
-
-          sender_id=current_user.id,
-
-          message=text
-
+            conversation_id=id,
+            sender_id=current_user.id,
+            message=text
         )
 
         db.session.add(msg)
-
         db.session.commit()
 
         return redirect(
-          f"/conversation/{id}"
+            f"/conversation/{id}"
         )
-    
 
-  
+
     @app.route("/messages")
     @login_required
     def messages():
-    
 
         conversations = Conversation.query.filter(
-
             (Conversation.buyer_id == current_user.id) |
             (Conversation.seller_id == current_user.id)
-
         ).order_by(Conversation.created_at.desc()).all()
 
         return render_template(
             "messages.html",
             conversations=conversations
         )
-    
 
 
     @app.route("/sold/<int:item_id>")
@@ -735,25 +723,23 @@ def register_routes(app):
         if item.user_id != current_user.id:
 
             flash(
-               "You cannot modify this listing.",
-               "danger"
+                "You cannot modify this listing.",
+                "danger"
             )
 
             return redirect("/profile")
 
-        item.is_sold = True
+        if item.is_sold:
+            flash(
+                "This item has already been sold.",
+                "warning"
+            )
+            return redirect("/profile")
 
-        item.sold_at = datetime.utcnow()
-
-        db.session.commit()
-
-        flash(
-           "Item marked as sold.",
-           "success"
+        # Buyer must be selected before completing the sale.
+        return redirect(
+            url_for("select_buyer", item_id=item.id)
         )
-
-        return redirect("/profile")
-    
 
 
     @app.route("/select-buyer/<int:item_id>", methods=["GET", "POST"])
@@ -762,128 +748,149 @@ def register_routes(app):
 
         item = Item.query.get_or_404(item_id)
 
-    # Only seller can access
+        # Only seller can access
         if item.user_id != current_user.id:
 
-           flash("Unauthorized", "danger")
+            flash("Unauthorized", "danger")
 
-           return redirect("/profile")
+            return redirect("/profile")
 
-    # Get all conversations for this item
+        if item.is_sold:
+
+            flash("This item has already been sold.", "warning")
+
+            return redirect("/profile")
+
+        # Get conversations for this item.
         conversations = Conversation.query.filter_by(
-            item_id=item.id
+            item_id=item.id,
+            seller_id=current_user.id
         ).all()
 
         unique_buyers = {}
 
         for conversation in conversations:
-           unique_buyers[conversation.buyer.id] = conversation.buyer
+            unique_buyers[conversation.buyer.id] = conversation.buyer
 
         buyers = list(unique_buyers.values())
 
         if request.method == "POST":
 
-          buyer_id = request.form["buyer_id"]
+            buyer_id = request.form.get("buyer_id", type=int)
+            buyer = unique_buyers.get(buyer_id)
 
-          item.buyer_id = buyer_id
+            if not buyer or buyer.id == current_user.id:
 
-          item.is_sold = True
+                flash("Please select a valid buyer.", "danger")
 
-          item.sold_at = datetime.utcnow()
+                return redirect(
+                    url_for("select_buyer", item_id=item.id)
+                )
 
-          db.session.commit()
+            item.buyer_id = buyer.id
+            item.is_sold = True
+            item.sold_at = datetime.utcnow()
 
-          flash(
-            "Item marked as sold.",
-            "success"
+            db.session.commit()
+
+            flash(
+                "Item marked as sold. Please review the buyer.",
+                "success"
             )
 
-          return redirect("/profile")
+            # Redirect seller to review the selected buyer.
+            return redirect(
+                url_for("review", item_id=item.id)
+            )
 
         return render_template(
-
-           "select_buyer.html",
-
-           item=item,
-
-           buyers=buyers
-
+            "select_buyer.html",
+            item=item,
+            buyers=buyers
         )
-    
+
 
     @app.route("/review/<int:item_id>", methods=["GET", "POST"])
     @login_required
     def review(item_id):
 
-       item = Item.query.get_or_404(item_id)
+        item = Item.query.get_or_404(item_id)
 
-    # Item must be sold
-       if not item.is_sold:
+        # Item must be sold and have a selected buyer.
+        if not item.is_sold or not item.buyer_id:
 
             flash("This item hasn't been sold yet.", "warning")
             return redirect("/items")
-       
-       if current_user.id == item.buyer_id:
+
+        # Determine who the current user is reviewing.
+        if current_user.id == item.buyer_id:
 
             reviewed_user = item.owner
 
-       elif current_user.id == item.user_id:
+        elif current_user.id == item.user_id:
 
             reviewed_user = User.query.get(item.buyer_id)
-    
-       else:
+
+        else:
 
             flash("You cannot review this transaction.", "danger")
             return redirect("/items")
-       
-       existing_review = Review.query.filter_by(
 
-        item_id=item.id,
+        if not reviewed_user:
 
-        reviewer_id=current_user.id
+            flash("The user for this review could not be found.", "danger")
+            return redirect("/profile")
 
+        # Allow only one review per user for each item.
+        existing_review = Review.query.filter_by(
+            item_id=item.id,
+            reviewer_id=current_user.id
         ).first()
 
-       if existing_review:
+        if existing_review:
 
-           flash("You have already reviewed this transaction.", "warning")
-
-           return redirect("/item/" + str(item.id))
-       
-       if request.method == "POST":
-           rating = int(request.form["rating"])
-
-           comment = request.form["comment"]
-
-           review = Review(
-
-            item_id=item.id,
-
-            reviewer_id=current_user.id,
-
-            reviewed_user_id=reviewed_user.id,
-
-            rating=rating,
-
-            comment=comment
-
+            flash(
+                "You have already reviewed this transaction.",
+                "warning"
             )
-           
-           db.session.add(review)
 
-           db.session.commit()
+            return redirect("/profile")
 
-           flash("Review submitted successfully.", "success")
+        if request.method == "POST":
 
-           return redirect("/item/" + str(item.id))
-       
-       return render_template(
+            rating = request.form.get("rating", type=int)
+            comment = request.form.get("comment", "").strip()
 
-        "review.html",
+            if rating not in range(1, 6):
 
-        item=item,
+                flash(
+                    "Please select a rating between 1 and 5.",
+                    "danger"
+                )
 
-        reviewed_user=reviewed_user
+                return render_template(
+                    "review.html",
+                    item=item,
+                    reviewed_user=reviewed_user
+                )
 
+            review_entry = Review(
+                item_id=item.id,
+                reviewer_id=current_user.id,
+                reviewed_user_id=reviewed_user.id,
+                rating=rating,
+                comment=comment
+            )
+
+            db.session.add(review_entry)
+            db.session.commit()
+
+            flash("Review submitted successfully.", "success")
+
+            return redirect("/profile")
+
+        return render_template(
+            "review.html",
+            item=item,
+            reviewed_user=reviewed_user
         )
-  

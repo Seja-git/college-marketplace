@@ -71,6 +71,23 @@
             </div>
         </div>
     </div>
+    
+{% if pending_reviews %}
+<div class="alert alert-info mb-4">
+    <h5>⭐ Review your purchase</h5>
+    <p>Share your experience with the seller.</p>
+
+    {% for item in pending_reviews %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span>{{ item.title }}</span>
+        <a href="{{ url_for('review', item_id=item.id) }}"
+           class="btn btn-success btn-sm">
+            Review Seller
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
     <!-- My purchases -->
     <section class="profile-section mb-5" id="purchases">

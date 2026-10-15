@@ -1,82 +1,95 @@
 {% extends "base.html" %}
 
-{% block title %}
-edit_item
-{% endblock %}
+{% block title %}CampusCart | Edit Item{% endblock %}
 
 {% block content %}
-   <body>
+<div class="container">
+    <div class="edit-item-wrap">
 
-    <h1>Edit Item</h1>
+        <header class="edit-item-header">
+            <span class="landing-eyebrow">MANAGE LISTING</span>
+            <h1 class="edit-item-title">Edit item</h1>
+            <p class="edit-item-subtitle">
+                Update your listing details and save the changes.
+            </p>
+        </header>
 
-    <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" class="edit-item-form">
 
-        <input
-            type="text"
-            name="title"
-            value="{{ item.title }}"
-        >
+            <div class="edit-item-field">
+                <label for="title" class="form-label">Title</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    class="form-control"
+                    value="{{ item.title }}"
+                >
+            </div>
 
-        <br><br>
+            <div class="edit-item-field">
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    class="form-control"
+                    rows="5"
+                >{{ item.description }}</textarea>
+            </div>
 
-        <textarea
-            name="description"
-        >{{ item.description }}</textarea>
+            <div class="edit-item-field">
+                <label for="price" class="form-label">Price</label>
+                <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    class="form-control"
+                    value="{{ item.price }}"
+                >
+            </div>
 
-        <br><br>
+            <div class="edit-item-field">
+                <label for="category" class="form-label">Category</label>
+                <select
+                    id="category"
+                    name="category"
+                    class="form-select"
+                    required
+                >
+                    {% for category in categories %}
+                        <option
+                            value="{{ category }}"
+                            {% if item.category == category %}selected{% endif %}
+                        >
+                            {{ category }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <input
-            type="number"
-            name="price"
-            value="{{ item.price }}"
-        >
+            {% if item.image %}
+            <div class="edit-item-field">
+                <label class="form-label">Current image</label>
+                <div class="edit-item-image-wrap">
+                    <img
+                        src="{{ url_for('static', filename='uploads/' + item.image) }}"
+                        alt="{{ item.title }}"
+                        class="edit-item-image"
+                    >
+                </div>
+            </div>
+            {% endif %}
 
-        <br><br>
+            <div class="edit-item-actions">
+                <button type="submit" class="btn btn-primary edit-item-submit">
+                    Save changes
+                </button>
+                <a href="{{ url_for('items') }}" class="btn edit-item-cancel">
+                    Cancel
+                </a>
+            </div>
 
-        <select
-        name="category"
-       class="form-select"
-       required>
-
-       {% for category in categories %}
-
-        <option
-            value="{{ category }}"
-            {% if item.category == category %}
-            selected
-            {% endif %}>
-
-            {{ category }}
-
-        </option>
-
-    {% endfor %}
-
-     </select>
-
-        <br><br>
-
-       {% if item.image %}
-    <div class="mb-3">
-
-    <label class="form-label">Current Image</label>
-
-    <br>
-
-    <img
-        src="{{ url_for('static', filename='uploads/' + item.image) }}"
-        class="img-thumbnail"
-        width="250">
-
-   </div>
-   {% endif %}
-
-        <button type="submit">
-            Save Changes
-        </button>
-
-    </form>
-
-</body>
-
+        </form>
+    </div>
+</div>
 {% endblock %}
