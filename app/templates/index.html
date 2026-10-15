@@ -1,0 +1,177 @@
+
+{% extends "base.html" %}
+
+{% block title %}CampusCart | Your Campus Marketplace{% endblock %}
+
+{% block content %}
+<section class="landing-hero">
+    <div class="landing-copy">
+        <span class="landing-eyebrow">
+            YOUR CAMPUS. YOUR MARKETPLACE.
+        </span>
+
+        <h1>
+            Give your stuff<br>
+            <span>a second life.</span>
+        </h1>
+
+        <p class="landing-description">
+            Buy, sell, and discover pre-loved campus essentials.
+            Find great deals, connect with fellow students, and
+            make every item count with CampusCart.
+        </p>
+
+        <div class="landing-actions">
+            <a href="{{ url_for('items') }}"
+               class="btn landing-btn-primary">
+                Explore Marketplace
+                <span aria-hidden="true">→</span>
+            </a>
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('create_item') }}"
+                   class="btn landing-btn-secondary">
+                    Start Selling
+                </a>
+            {% else %}
+                <a href="{{ url_for('register') }}"
+                   class="btn landing-btn-secondary">
+                    Join CampusCart
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="landing-trust">
+            <span>♻️</span>
+            A smarter way to reuse, resell, and reconnect.
+        </div>
+    </div>
+
+    <div class="landing-visual">
+        <div class="landing-visual-heading">
+            <span>Made for student life</span>
+            <span class="landing-status-dot"></span>
+        </div>
+
+        <div class="landing-product-card">
+            <div class="landing-product-icon">📚</div>
+            <div>
+                <h3>Books & Notes</h3>
+                <p>Pass knowledge forward.</p>
+            </div>
+            <span class="landing-card-arrow">↗</span>
+        </div>
+
+        <div class="landing-product-card">
+            <div class="landing-product-icon">💻</div>
+            <div>
+                <h3>Electronics</h3>
+                <p>Find your next essential.</p>
+            </div>
+            <span class="landing-card-arrow">↗</span>
+        </div>
+
+        <div class="landing-product-card">
+            <div class="landing-product-icon">🎒</div>
+            <div>
+                <h3>Campus Essentials</h3>
+                <p>Good finds, new owners.</p>
+            </div>
+            <span class="landing-card-arrow">↗</span>
+        </div>
+
+        <div class="landing-copilot-note">
+            <span class="landing-sparkle">✳</span>
+            <div>
+                <strong>Meet your AI Copilot</strong>
+                <p>Get help discovering products and creating listings.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="landing-features">
+    <div class="landing-section-heading">
+        <span class="landing-eyebrow">MORE THAN A MARKETPLACE</span>
+        <h2>Everything you need, all in one place.</h2>
+        <p>From your first search to your next great deal.</p>
+    </div>
+
+    <div class="landing-feature-grid">
+        <article class="landing-feature">
+            <div class="landing-feature-icon">⌕</div>
+            <h3>Discover smarter</h3>
+            <p>
+                Explore campus essentials with product search
+                designed to help you find relevant listings.
+            </p>
+        </article>
+
+        <article class="landing-feature">
+            <div class="landing-feature-icon">↗</div>
+            <h3>Sell with ease</h3>
+            <p>
+                Create listings, set your price, and connect
+                with students interested in your items.
+            </p>
+        </article>
+
+        <article class="landing-feature">
+            <div class="landing-feature-icon">✳</div>
+            <h3>Let AI help</h3>
+            <p>
+                Get assistance with listing descriptions,
+                price guidance, and negotiation drafts.
+            </p>
+        </article>
+
+        <article class="landing-feature">
+            <div class="landing-feature-icon">♡</div>
+            <h3>Keep what you love</h3>
+            <p>
+                Save interesting items to your wishlist
+                and revisit them whenever you need.
+            </p>
+        </article>
+    </div>
+</section>
+
+<section class="landing-how">
+    <div>
+        <span class="landing-eyebrow">SIMPLE BY DESIGN</span>
+        <h2>Your next great find is three steps away.</h2>
+    </div>
+
+    <div class="landing-steps">
+        <div class="landing-step">
+            <span>01</span>
+            <h3>Join</h3>
+            <p>Create an account to access the marketplace.</p>
+        </div>
+
+        <div class="landing-step">
+            <span>02</span>
+            <h3>Discover or list</h3>
+            <p>Find something useful or give your item a new home.</p>
+        </div>
+
+        <div class="landing-step">
+            <span>03</span>
+            <h3>Connect</h3>
+            <p>Chat with buyers or sellers to coordinate your exchange.</p>
+        </div>
+    </div>
+</section>
+
+<section class="landing-final-cta">
+    <div>
+        <h2>Ready to make your next campus find?</h2>
+        <p>Your next useful item might already be here.</p>
+    </div>
+
+    <a href="{{ url_for('items') }}"
+       class="btn landing-btn-light">
+        Explore CampusCart →
+    </a>
+</section>
+{% endblock %}

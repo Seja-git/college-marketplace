@@ -41,8 +41,11 @@
 
                 <ul class="navbar-nav campus-account-nav">
                     {% if current_user.is_authenticated %}
+                    
                     <li class="nav-item">
-                        <a class="nav-link campus-wishlist-link" href="/profile#wishlist">Wishlist</a>
+                        <a class="nav-icon-link" href="/profile#wishlist" aria-label="Saved items" title="Saved items">
+                            <svg viewBox="0 0 24 24" fill="none"><path d="M20.4 8.7c0 4.1-8.4 10-8.4 10s-8.4-5.9-8.4-10A4.5 4.5 0 0 1 12 6.4a4.5 4.5 0 0 1 8.4 2.3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-icon-link" href="{{ url_for('messages') }}" aria-label="Messages" title="Messages">

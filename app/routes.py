@@ -1,7 +1,11 @@
 # app/routes.py
 import os
 import uuid
+import smtplib
+from email.message import EmailMessage
 
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from flask import url_for
 from datetime import datetime
 from app.utils import get_seller_rating
 from ai_features.utils.recommendation import recommend
@@ -30,7 +34,68 @@ from app.forms import CATEGORIES
 
 import re
 
+def generate_reset_token(user):
+    serializer = URLSafeTimedSerializer(
+        current_app.config["SECRET_KEY"]
+    )
+    return serializer.dumps(
+        user.email,
+        salt="campuscart-password-reset"
+    )
 
+
+def verify_reset_token(token, max_age=1800):
+    serializer = URLSafeTimedSerializer(
+        current_app.config["SECRET_KEY"]
+    )
+
+    try:
+        email = serializer.loads(
+            token,
+            salt="campuscart-password-reset",
+            max_age=max_age
+        )
+    except (SignatureExpired, BadSignature):
+        return None
+
+    return User.query.filter_by(email=email).first()
+
+
+def send_reset_email(user, reset_url):
+    smtp_user = os.getenv("MAIL_USERNAME")
+    smtp_password = os.getenv("MAIL_PASSWORD")
+
+    if not smtp_user or not smtp_password:
+        raise RuntimeError("Email credentials are not configured.")
+
+    message = EmailMessage()
+    message["Subject"] = "Reset your CampusCart password"
+    message["From"] = smtp_user
+    message["To"] = user.email
+
+    message.set_content(
+        f"""Hi {user.username},
+
+We received a request to reset your CampusCart password.
+
+Use the link below to choose a new password:
+{reset_url}
+
+This link expires in 30 minutes. If you did not request a reset,
+you can ignore this email.
+
+CampusCart Team
+"""
+    )
+
+    with smtplib.SMTP(
+        os.getenv("MAIL_SERVER", "smtp.gmail.com"),
+        int(os.getenv("MAIL_PORT", "587")),
+        timeout=15
+    ) as server:
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(message)
 
 def register_routes(app):
 
@@ -121,6 +186,77 @@ def register_routes(app):
         return render_template("login.html")
 
 
+    
+    @app.route("/forgot-password", methods=["GET", "POST"])
+    def forgot_password():
+        if request.method == "POST":
+            email = request.form.get("email", "").strip()
+            user = User.query.filter_by(email=email).first()
+
+            # Use the same response whether the email exists or not.
+            if user:
+                try:
+                    token = generate_reset_token(user)
+                    reset_url = url_for(
+                        "reset_password",
+                        token=token,
+                        _external=True
+                    )
+                    send_reset_email(user, reset_url)
+                except Exception:
+                    current_app.logger.exception(
+                        "Could not send password reset email"
+                    )
+
+            flash(
+                "If an account exists for that email, "
+                "a password reset link will be sent.",
+                "info"
+            )
+            return redirect("/forgot-password")
+
+        return render_template("forgot_password.html")
+
+
+    @app.route("/reset-password/<token>", methods=["GET", "POST"])
+    def reset_password(token):
+        user = verify_reset_token(token)
+
+        if user is None:
+            flash(
+                "This reset link is invalid or expired. "
+                "Please request a new one.",
+                "danger"
+            )
+            return redirect("/forgot-password")
+
+        if request.method == "POST":
+            password = request.form.get("password", "")
+            confirm_password = request.form.get(
+                "confirm_password", ""
+            )
+
+            if len(password) < 6:
+                flash(
+                    "Password must be at least 6 characters long.",
+                    "danger"
+                )
+            elif password != confirm_password:
+                flash("Passwords do not match.", "danger")
+            else:
+                user.password = generate_password_hash(password)
+                db.session.commit()
+
+                flash(
+                    "Password reset successful. Please log in.",
+                    "success"
+                )
+                return redirect("/login")
+
+        return render_template("reset_password.html")
+
+    
+
     @app.route("/logout")
     @login_required
     def logout():
@@ -133,8 +269,11 @@ def register_routes(app):
 
 
     @app.route("/")
+    def home():
+        return render_template("index.html")
+    
     @app.route("/items")
-    @login_required
+    
     def items():
 
       query = Item.query
